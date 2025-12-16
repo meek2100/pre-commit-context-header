@@ -1,0 +1,7 @@
+[project]
+name = "pre-commit-context-header"
+version = "0.1.0"
+description = "A universal pre-commit utility that enforces file path headers to ensure AI coding agents and LLMs always maintain context."
+authors = [{ name = "meek2100", email = "meek2100@users.noreply.github.com" }]
+requires-python = ">=3.9"
+dependencies = []
