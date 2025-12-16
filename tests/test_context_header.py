@@ -1,9 +1,16 @@
 # File: tests/test_context_header.py
 import pytest
 from pathlib import Path
-from context_headers import process_file, get_insertion_index, MAX_FILE_SIZE_BYTES, is_header_line, main
+from context_headers import (
+    process_file,
+    get_insertion_index,
+    MAX_FILE_SIZE_BYTES,
+    is_header_line,
+    main,
+)
 from unittest.mock import patch
 import sys
+
 
 def test_insertion_index_simple() -> None:
     lines = ["print('hello')\n"]
@@ -27,6 +34,11 @@ def test_insertion_index_shebang_and_encoding() -> None:
         "print('hello')\n",
     ]
     assert get_insertion_index(lines) == 2
+
+
+def test_insertion_index_xml() -> None:
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>\n', "<root></root>\n"]
+    assert get_insertion_index(lines) == 1
 
 
 def test_process_file_adds_header(tmp_path: Path) -> None:
@@ -82,6 +94,7 @@ def test_html_comment_style(tmp_path: Path) -> None:
     expected = f"<!-- File: {f.as_posix()} -->\n<div>Content</div>\n"
     assert content == expected
 
+
 def test_xml_comment_style(tmp_path: Path) -> None:
     f = tmp_path / "config.xml"
     f.write_text("<root></root>", encoding="utf-8")
@@ -91,6 +104,18 @@ def test_xml_comment_style(tmp_path: Path) -> None:
     content = f.read_text(encoding="utf-8")
     expected = f"<!-- File: {f.as_posix()} -->\n<root></root>\n"
     assert content == expected
+
+
+def test_process_file_xml_safety(tmp_path: Path) -> None:
+    f = tmp_path / "data.xml"
+    f.write_text('<?xml version="1.0"?>\n<root>data</root>', encoding="utf-8")
+
+    process_file(str(f), fix_mode=True)
+
+    content = f.read_text(encoding="utf-8")
+    expected = f'<?xml version="1.0"?>\n\n<root>data</root>\n'
+    assert content == expected
+
 
 def test_vue_comment_style(tmp_path: Path) -> None:
     f = tmp_path / "App.vue"
@@ -102,6 +127,7 @@ def test_vue_comment_style(tmp_path: Path) -> None:
     expected = f"<!-- File: {f.as_posix()} -->\n<template></template>\n"
     assert content == expected
 
+
 def test_md_comment_style(tmp_path: Path) -> None:
     f = tmp_path / "README.md"
     f.write_text("# Title", encoding="utf-8")
@@ -111,6 +137,7 @@ def test_md_comment_style(tmp_path: Path) -> None:
     content = f.read_text(encoding="utf-8")
     expected = f"<!-- File: {f.as_posix()} -->\n# Title\n"
     assert content == expected
+
 
 def test_process_file_large_file(tmp_path: Path) -> None:
     f = tmp_path / "large.py"
@@ -124,6 +151,7 @@ def test_process_file_large_file(tmp_path: Path) -> None:
     # Verify content is unchanged
     assert f.read_text(encoding="utf-8") == "print('large')"
 
+
 def test_process_file_permission_error(tmp_path: Path) -> None:
     f = tmp_path / "protected.py"
     f.write_text("print('secret')", encoding="utf-8")
@@ -131,6 +159,7 @@ def test_process_file_permission_error(tmp_path: Path) -> None:
     # Mock stat to raise PermissionError
     with patch("pathlib.Path.stat", side_effect=PermissionError("Permission denied")):
         assert not process_file(str(f), fix_mode=True)
+
 
 def test_process_file_update_incorrect_header(tmp_path: Path) -> None:
     f = tmp_path / "wrong.py"
@@ -145,7 +174,10 @@ def test_process_file_update_incorrect_header(tmp_path: Path) -> None:
     expected = f"# File: {f.as_posix()}\nprint('hello')\n"
     assert content == expected
 
-def test_process_file_no_fix_mode(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+
+def test_process_file_no_fix_mode(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     f = tmp_path / "nofix.py"
     f.write_text("print('hello')\n", encoding="utf-8")
 
@@ -159,6 +191,7 @@ def test_process_file_no_fix_mode(tmp_path: Path, capsys: pytest.CaptureFixture[
     captured = capsys.readouterr()
     assert "Missing or incorrect header" in captured.out
 
+
 def test_dockerfile(tmp_path: Path) -> None:
     f = tmp_path / "Dockerfile"
     f.write_text("FROM python:3\n", encoding="utf-8")
@@ -169,12 +202,14 @@ def test_dockerfile(tmp_path: Path) -> None:
     expected = f"# File: {f.as_posix()}\nFROM python:3\n"
     assert content == expected
 
+
 def test_unknown_extension(tmp_path: Path) -> None:
     f = tmp_path / "unknown.xyz"
     f.write_text("content", encoding="utf-8")
 
     assert not process_file(str(f), fix_mode=True)
     assert f.read_text(encoding="utf-8") == "content"
+
 
 def test_process_file_read_oserror(tmp_path: Path) -> None:
     f = tmp_path / "unreadable.py"
@@ -184,9 +219,10 @@ def test_process_file_read_oserror(tmp_path: Path) -> None:
     with patch("pathlib.Path.read_text", side_effect=OSError("Read error")):
         assert not process_file(str(f), fix_mode=True)
 
+
 def test_process_file_missing_newline_at_eof(tmp_path: Path) -> None:
     f = tmp_path / "no_newline.py"
-    f.write_text("print('hello')", encoding="utf-8") # No newline at end
+    f.write_text("print('hello')", encoding="utf-8")  # No newline at end
 
     process_file(str(f), fix_mode=True)
 
@@ -194,6 +230,7 @@ def test_process_file_missing_newline_at_eof(tmp_path: Path) -> None:
     # Should add header AND ensure newline at end of original last line (which is now after header)
     expected = f"# File: {f.as_posix()}\nprint('hello')\n"
     assert content == expected
+
 
 def test_is_header_line_edge_cases() -> None:
     # Test unknown extension
@@ -204,8 +241,10 @@ def test_is_header_line_edge_cases() -> None:
         assert is_header_line("PREFIX", ".test")
         assert not is_header_line("OTHER", ".test")
 
+
 def test_insertion_index_empty_lines() -> None:
     assert get_insertion_index([]) == 0
+
 
 def test_insertion_index_shebang_only_greater_than_len(tmp_path: Path) -> None:
     # This line: if insert_idx > len(lines): insert_idx = len(lines)
@@ -221,16 +260,23 @@ def test_insertion_index_shebang_only_greater_than_len(tmp_path: Path) -> None:
         content = f.read_text(encoding="utf-8")
         assert content.endswith("# File: " + f.as_posix() + "\n")
 
+
 def test_main_cli_fix(tmp_path: Path) -> None:
     f = tmp_path / "cli_test.py"
     f.write_text("print('cli')\n", encoding="utf-8")
 
-    with patch("sys.argv", ["context-headers", "--fix", str(f)]), pytest.raises(SystemExit) as e:
+    with (
+        patch("sys.argv", ["context-headers", "--fix", str(f)]),
+        pytest.raises(SystemExit) as e,
+    ):
         main()
     assert e.value.code == 1
     assert f.read_text().startswith("# File:")
 
-def test_main_cli_check_fail(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+
+def test_main_cli_check_fail(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     f = tmp_path / "cli_fail.py"
     f.write_text("print('fail')\n", encoding="utf-8")
 
@@ -240,6 +286,7 @@ def test_main_cli_check_fail(tmp_path: Path, capsys: pytest.CaptureFixture[str])
     captured = capsys.readouterr()
     assert "missing/incorrect headers" in captured.out
 
+
 def test_main_cli_check_pass(tmp_path: Path) -> None:
     f = tmp_path / "cli_pass.py"
     f.write_text(f"# File: {f.as_posix()}\nprint('pass')\n", encoding="utf-8")
@@ -248,10 +295,12 @@ def test_main_cli_check_pass(tmp_path: Path) -> None:
         main()
     assert e.value.code == 0
 
+
 def test_main_cli_no_args() -> None:
     with patch("sys.argv", ["context-headers"]), pytest.raises(SystemExit) as e:
         main()
     assert e.value.code == 0
+
 
 def test_run_as_script(tmp_path: Path) -> None:
     # This will actually run the file as a script using subprocess, verifying the `if __name__ == "__main__":` block.

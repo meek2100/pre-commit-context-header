@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # File: context_headers.py
+from __future__ import annotations
+
 """
 Universal utility to check or enforce file headers (banners).
 
@@ -61,7 +63,7 @@ COMMENT_STYLES = {
 }
 
 
-def get_expected_header(filepath: Path) -> "str | None":
+def get_expected_header(filepath: Path) -> str | None:
     """Generate the expected header string based on file extension."""
     if filepath.name == "Dockerfile":
         ext = ".dockerfile"
@@ -95,18 +97,19 @@ def is_header_line(line: str, extension: str) -> bool:
 def get_insertion_index(lines: list[str]) -> int:
     """
     Determine the safe insertion index.
-    Skips Shebangs (#!...) and Python Encoding cookies (coding=...).
+    Skips Shebangs (#!...), XML declarations (<?xml...), and Python Encoding cookies (coding=...).
     """
     idx = 0
     if not lines:
         return 0
 
-    # 1. Skip Shebang
-    if lines[idx].startswith("#!"):
+    # 1. Skip Shebang or XML Declaration (Must be line 0)
+    first_line = lines[idx].strip()
+    if first_line.startswith("#!") or first_line.startswith("<?xml"):
         idx += 1
 
     # 2. Skip Encoding Cookie (PEP 263)
-    # Must be on line 1 or 2. If we passed a shebang, we are at line 2.
+    # Must be on line 1 or 2. If we passed a shebang/xml, we are at line 2.
     if idx < len(lines):
         line = lines[idx].strip()
         # Regex approximation of PEP 263

@@ -1,14 +1,10 @@
+
 # pre-commit-context-header
 
-![PyPI Version](https://img.shields.io/pypi/v/pre-commit-context-header)
+![PyPI - Version](https://img.shields.io/pypi/v/pre-commit-context-header)
 ![Python Versions](https://img.shields.io/pypi/pyversions/pre-commit-context-header)
 ![License](https://img.shields.io/github/license/meek2100/pre-commit-context-header)
-[![Mypy](https://github.com/meek2100/pre-commit-context-header/actions/workflows/mypy.yml/badge.svg)](https://github.com/meek2100/pre-commit-context-header/actions/workflows/mypy.yml)
-[![PyPI](https://github.com/jessielw/deluge-web-client/actions/workflows/python_publish.yml/badge.svg)](https://github.com/meek2100/pre-commit-context-header/actions/workflows/python_publish.yml)
-[![Ruff](https://github.com/meek2100/pre-commit-context-header/actions/workflows/ruff.yml/badge.svg)](https://github.com/meek2100/pre-commit-context-header/actions/workflows/ruff.yml)
-
-![PyPI - Version](https://img.shields.io/pypi/v/pre-commit-context-header)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/meek2100/pre-commit-context-header/ci.yaml)
+[![CI Status](https://github.com/meek2100/pre-commit-context-header/actions/workflows/ci.yaml/badge.svg)](https://github.com/meek2100/pre-commit-context-header/actions/workflows/ci.yaml)
 
 A [pre-commit](https://pre-commit.com) hook that enforces file path headers (banners) at the top of source files.
 
