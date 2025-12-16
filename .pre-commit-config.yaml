@@ -1,13 +1,14 @@
+# File: .pre-commit-config.yaml
 repos:
   - repo: .
-    rev: HEAD # Points to the local repository
+    rev: c63b7777fb1872f8aca90718f043f27019723126 # Points to the local repository
     hooks:
       - id: context-headers
         args: [--fix]
 
   # Optional: Standard hooks to keep your code clean
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer

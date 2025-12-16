@@ -1,3 +1,4 @@
+# File: .pre-commit-hooks.yaml
 - id: context-headers
   name: Check/Add Context Headers
   description: Ensures files have a comment at the top indicating their path (useful for AI context).

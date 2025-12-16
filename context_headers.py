@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# File: context_headers.py
 """
 Universal utility to check or enforce file headers (banners).
 
@@ -21,11 +22,18 @@ COMMENT_STYLES = {
     ".yaml": "# File: {}",
     ".yml": "# File: {}",
     ".sh": "# File: {}",
+    ".bash": "# File: {}",
+    ".zsh": "# File: {}",
     ".toml": "# File: {}",
     ".tf": "# File: {}",
     ".dockerfile": "# File: {}",
     ".rb": "# File: {}",
     ".pl": "# File: {}",
+    ".conf": "# File: {}",
+    ".properties": "# File: {}",
+    ".ini": "; File: {}",
+    # Database
+    ".sql": "-- File: {}",
     # Web / JS
     ".js": "// File: {}",
     ".ts": "// File: {}",
