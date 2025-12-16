@@ -9,6 +9,11 @@
     (?x)^(
         package-lock\.json|
         poetry\.lock|
+        yarn\.lock|
         .*\.min\.js|
-        .*\.svg
+        .*\.min\.css|
+        .*\.svg|
+        .*\.json|
+        .*\.geojson|
+        .*\.map
     )$

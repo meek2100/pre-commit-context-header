@@ -1,0 +1,15 @@
+repos:
+  - repo: .
+    rev: HEAD # Points to the local repository
+    hooks:
+      - id: context-headers
+        args: [--fix]
+
+  # Optional: Standard hooks to keep your code clean
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
