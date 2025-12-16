@@ -1,5 +1,11 @@
-
 # pre-commit-context-header
+
+![PyPI Version](https://img.shields.io/pypi/v/pre-commit-context-header)
+![Python Versions](https://img.shields.io/pypi/pyversions/pre-commit-context-header)
+![License](https://img.shields.io/github/license/meek2100/pre-commit-context-header)
+[![Mypy](https://github.com/meek2100/pre-commit-context-header/actions/workflows/mypy.yml/badge.svg)](https://github.com/meek2100/pre-commit-context-header/actions/workflows/mypy.yml)
+[![PyPI](https://github.com/jessielw/deluge-web-client/actions/workflows/python_publish.yml/badge.svg)](https://github.com/meek2100/pre-commit-context-header/actions/workflows/python_publish.yml)
+[![Ruff](https://github.com/meek2100/pre-commit-context-header/actions/workflows/ruff.yml/badge.svg)](https://github.com/meek2100/pre-commit-context-header/actions/workflows/ruff.yml)
 
 ![PyPI - Version](https://img.shields.io/pypi/v/pre-commit-context-header)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/meek2100/pre-commit-context-header/ci.yaml)
@@ -27,11 +33,11 @@ repos:
 
 The tool supports context headers for the following file extensions:
 
-*   **Scripting / Config:** `.py`, `.yaml`, `.yml`, `.sh`, `.bash`, `.zsh`, `.toml`, `.tf`, `.dockerfile` (and `Dockerfile`), `.rb`, `.pl`, `.conf`, `.properties`, `.ini`
-*   **Database:** `.sql`
-*   **Web / JS:** `.js`, `.ts`, `.jsx`, `.tsx`, `.css`, `.scss`, `.less`, `.vue`
-*   **Compiled / Systems:** `.java`, `.kt`, `.rs`, `.go`, `.c`, `.cpp`, `.h`, `.hpp`, `.cs`, `.swift`
-*   **Documentation / Markup:** `.html`, `.md`, `.xml`
+- **Scripting / Config:** `.py`, `.yaml`, `.yml`, `.sh`, `.bash`, `.zsh`, `.toml`, `.tf`, `.dockerfile` (and `Dockerfile`), `.rb`, `.pl`, `.conf`, `.properties`, `.ini`
+- **Database:** `.sql`
+- **Web / JS:** `.js`, `.ts`, `.jsx`, `.tsx`, `.css`, `.scss`, `.less`, `.vue`
+- **Compiled / Systems:** `.java`, `.kt`, `.rs`, `.go`, `.c`, `.cpp`, `.h`, `.hpp`, `.cs`, `.swift`
+- **Documentation / Markup:** `.html`, `.md`, `.xml`
 
 For HTML, Markdown, XML, and Vue files, it uses visible comments (e.g., `<!-- File: ... -->`).
 
