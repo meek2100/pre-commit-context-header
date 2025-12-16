@@ -26,7 +26,7 @@ classifiers = [
 dev = ["pytest", "pytest-cov", "mypy", "ruff", "types-setuptools"]
 
 [project.scripts]
-context-headers = "context_headers:main"
+context-headers = "context_headers.cli:main"
 
 [build-system]
 requires = ["setuptools>=61.0"]
@@ -40,15 +40,13 @@ warn_unused_configs = true
 exclude = ["build/"]
 
 [[tool.mypy.overrides]]
-module = [
-    "pytest",
-    "_pytest.*"
-]
+module = ["pytest", "_pytest.*"]
 ignore_missing_imports = true
 follow_imports = "skip"
 
 [tool.pytest.ini_options]
 addopts = "--cov=context_headers --cov-report=term-missing --cov-fail-under=100"
+pythonpath = ["src"]
 
 [tool.ruff]
 line-length = 88
