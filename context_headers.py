@@ -54,14 +54,14 @@ COMMENT_STYLES = {
     ".cs": "// File: {}",
     ".swift": "// File: {}",
     # HTML / Markdown / XML (Using visible comments)
-    ".html": "",
-    ".md": "",
-    ".xml": "",
-    ".vue": "",
+    ".html": "<!-- File: {} -->",
+    ".md": "<!-- File: {} -->",
+    ".xml": "<!-- File: {} -->",
+    ".vue": "<!-- File: {} -->",
 }
 
 
-def get_expected_header(filepath: Path) -> str | None:
+def get_expected_header(filepath: Path) -> "str | None":
     """Generate the expected header string based on file extension."""
     if filepath.name == "Dockerfile":
         ext = ".dockerfile"
@@ -128,7 +128,7 @@ def process_file(filepath: str, fix_mode: bool) -> bool:
         if path_obj.stat().st_size > MAX_FILE_SIZE_BYTES:
             # Silently skip large files
             return False
-    except OSError:
+    except (OSError, PermissionError):
         return False
 
     # 2. Extension Check
@@ -218,4 +218,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main()  # pragma: no cover

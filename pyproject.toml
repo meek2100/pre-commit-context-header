@@ -23,7 +23,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "build"]
+dev = ["pytest", "pytest-cov", "mypy", "ruff", "types-setuptools"]
 
 [project.scripts]
 context-headers = "context_headers:main"
@@ -31,3 +31,25 @@ context-headers = "context_headers:main"
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.mypy]
+strict = true
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+exclude = ["build/"]
+
+[[tool.mypy.overrides]]
+module = [
+    "pytest",
+    "_pytest.*"
+]
+ignore_missing_imports = true
+follow_imports = "skip"
+
+[tool.pytest.ini_options]
+addopts = "--cov=context_headers --cov-report=term-missing --cov-fail-under=100"
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
