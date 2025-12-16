@@ -1,7 +1,7 @@
 - id: context-headers
   name: Check/Add Context Headers
   description: Ensures files have a comment at the top indicating their path (useful for AI context).
-  entry: python3 context_headers.py
+  entry: context-headers
   language: python
   types: [text]
   # Files to exclude by default from all projects using this hook

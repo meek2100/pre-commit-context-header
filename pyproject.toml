@@ -5,3 +5,6 @@ description = "A universal pre-commit utility that enforces file path headers to
 authors = [{ name = "meek2100", email = "meek2100@users.noreply.github.com" }]
 requires-python = ">=3.9"
 dependencies = []
+
+[project.scripts]
+context-headers = "context_headers:main"
