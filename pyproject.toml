@@ -52,7 +52,13 @@ pythonpath = ["src"]
 line-length = 88
 target-version = "py39"
 
+[tool.coverage.run]
+source = ["src"]
+branch = false
+
 [tool.coverage.report]
+show_missing = true
+skip_covered = false
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",

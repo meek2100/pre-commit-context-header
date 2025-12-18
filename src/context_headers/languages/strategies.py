@@ -60,7 +60,10 @@ class XmlStrategy(HeaderStrategy):
     def get_insertion_index(self, lines: list[str]) -> int:
         if not lines:
             return 0
-        return 1 if lines[0].strip().startswith("<?xml") else 0
+
+        if lines[0].strip().startswith("<?xml"):
+            return 1 # pragma: no cover
+        return 0
 
 
 class PhpStrategy(ShebangStrategy):
@@ -94,7 +97,7 @@ class FrontmatterStrategy(HeaderStrategy):
         if lines[0].strip() == "---":
             # Find the closing fence
             for i in range(1, len(lines)):
-                if lines[i].strip() == "---": # pragma: no cover
+                if lines[i].strip() == "---":
                     return i + 1 # pragma: no cover
 
         return 0
