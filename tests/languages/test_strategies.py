@@ -104,3 +104,11 @@ def test_strategy_no_placeholder() -> None:
     assert strategy.get_expected_header(Path("foo")) == "HEADER\n"
     assert strategy.is_header_line("HEADER")
     assert not strategy.is_header_line("OTHER")
+
+def test_xml_strategy_empty() -> None:
+    strategy = XmlStrategy("")
+    assert strategy.get_insertion_index([]) == 0
+
+def test_frontmatter_strategy_empty() -> None:
+    strategy = FrontmatterStrategy("<!-- File: {} -->")
+    assert strategy.get_insertion_index([]) == 0

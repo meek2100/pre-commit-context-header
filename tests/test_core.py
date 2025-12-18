@@ -89,6 +89,16 @@ def test_process_file_already_correct(tmp_path: Path) -> None:
     assert not process_file(str(f), fix_mode=True)
 
 
+def test_process_file_updates_incorrect_header(tmp_path: Path) -> None:
+    f = tmp_path / "wrong.py"
+    f.write_text("# File: wrong/path.py\nprint('hi')\n", encoding="utf-8")
+
+    assert process_file(str(f), fix_mode=True)
+
+    content = f.read_text(encoding="utf-8")
+    assert content.startswith(f"# File: {f.as_posix()}\n")
+
+
 def test_process_file_clamps_index(tmp_path: Path) -> None:
     f = tmp_path / "clamp.py"
     f.write_text("print('hi')\n", encoding="utf-8")
