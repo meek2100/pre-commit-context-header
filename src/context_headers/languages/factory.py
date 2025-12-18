@@ -9,6 +9,8 @@ from .strategies import (
     PythonStrategy,
     ShebangStrategy,
     XmlStrategy,
+    PhpStrategy,
+    FrontmatterStrategy,
 )
 
 
@@ -31,13 +33,24 @@ def get_strategy_for_file(path_obj: Path) -> HeaderStrategy | None:
     # 3. Select Strategy
     if ext == ".py":
         return PythonStrategy(style)
-    elif ext in [".xml", ".html", ".vue"]:
-        # Note: HTML usually doesn't need to skip lines, but XML/Vue might
-        # if they have XML declarations. XmlStrategy handles `<?xml` safely.
+
+    if ext == ".php":
+        return PhpStrategy(style)
+
+    if ext == ".astro":
+        return FrontmatterStrategy(style)
+
+    # XML / HTML / Templates
+    if ext in [".xml", ".html", ".vue", ".svelte", ".aspx", ".cshtml"]:
         return XmlStrategy(style)
-    elif ext in [".sh", ".bash", ".zsh", ".rb", ".pl", ".js", ".ts"]:
-        # Many scripting languages support shebangs
+
+    # Scripts that support Shebangs
+    if ext in [
+        ".sh", ".bash", ".zsh", ".rb", ".pl", ".js", ".ts", ".mjs", ".cjs",
+        ".ps1", ".lua", ".r", ".tcl", ".awk", ".jl", ".exs", ".dart", ".swift", ".scala",
+        ".dockerfile"
+    ]:
         return ShebangStrategy(style)
 
-    # Fallback for others (Markdown, CSS, SQL, etc.)
+    # Fallback for others (Markdown, CSS, SQL, Configs, etc.)
     return DefaultStrategy(style)
