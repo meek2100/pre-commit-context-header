@@ -2,6 +2,7 @@
 from __future__ import annotations
 import pytest
 from pathlib import Path
+from unittest.mock import patch
 from context_headers.cli import run
 
 
@@ -43,3 +44,12 @@ def test_cli_check_mode_failure(tmp_path: Path, capsys: pytest.CaptureFixture[st
 
     out = capsys.readouterr().out
     assert "Missing or incorrect header" in out
+
+def test_main_entry_point() -> None:
+    """Test the main entry point calls run and exits."""
+    with patch("context_headers.cli.run") as mock_run, \
+         patch("sys.exit") as mock_exit:
+        mock_run.return_value = 0
+        from context_headers.cli import main
+        main()
+        mock_exit.assert_called_with(0)

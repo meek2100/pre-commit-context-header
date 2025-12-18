@@ -51,3 +51,12 @@ pythonpath = ["src"]
 [tool.ruff]
 line-length = 88
 target-version = "py39"
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
