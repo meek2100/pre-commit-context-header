@@ -55,6 +55,10 @@ def test_factory_selects_correct_strategy() -> None:
     assert isinstance(get_strategy_for_file(Path("test.toml")), ShebangStrategy)
     assert isinstance(get_strategy_for_file(Path("test.yaml")), ShebangStrategy)
     assert isinstance(get_strategy_for_file(Path("test.bat")), ShebangStrategy)
+    assert isinstance(get_strategy_for_file(Path("test.tab")), ShebangStrategy)
+
+    # Exotic
+    assert isinstance(get_strategy_for_file(Path("test.🔥")), ShebangStrategy)
 
     # Dotfiles
     assert isinstance(get_strategy_for_file(Path(".bashrc")), ShebangStrategy)
