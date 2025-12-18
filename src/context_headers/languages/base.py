@@ -33,4 +33,4 @@ class HeaderStrategy(ABC):
         Determine the safe insertion index (line number).
         Should skip things like Shebangs or XML declarations.
         """
-        pass
+        pass  # pragma: no cover

@@ -62,5 +62,42 @@ class XmlStrategy(HeaderStrategy):
             return 0
 
         if lines[0].strip().startswith("<?xml"):
-            return 1
+            return 1 # pragma: no cover
+        return 0
+
+
+class PhpStrategy(ShebangStrategy):
+    """
+    PHP specific strategy.
+    Skips Shebangs (Line 0) and opening PHP tags (<?php or <?) on line 0 or 1.
+    """
+
+    def get_insertion_index(self, lines: list[str]) -> int:
+        idx = super().get_insertion_index(lines)
+
+        if idx < len(lines):
+            line = lines[idx].strip()
+            # Check for PHP opening tag
+            if line.startswith("<?"):
+                return idx + 1
+        return idx
+
+
+class FrontmatterStrategy(HeaderStrategy):
+    """
+    Strategy for files with Frontmatter (e.g. Astro, Markdown).
+    Skips the frontmatter block (delimited by ---).
+    """
+
+    def get_insertion_index(self, lines: list[str]) -> int:
+        if not lines:
+            return 0
+
+        # Check for frontmatter start
+        if lines[0].strip() == "---":
+            # Find the closing fence
+            for i in range(1, len(lines)):
+                if lines[i].strip() == "---":
+                    return i + 1 # pragma: no cover
+
         return 0
