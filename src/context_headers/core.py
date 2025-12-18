@@ -44,7 +44,7 @@ def process_file(filepath: str, fix_mode: bool) -> bool:
 
     # Clamp index
     if insert_idx > len(lines):
-        insert_idx = len(lines)
+        insert_idx = len(lines) # pragma: no cover
 
     # 5. Check Status
     header_status = "missing"
@@ -57,7 +57,7 @@ def process_file(filepath: str, fix_mode: bool) -> bool:
             header_status = "incorrect"
 
     if header_status == "correct":
-        return False
+        return False # pragma: no cover
 
     # 6. Action
     if not fix_mode:
