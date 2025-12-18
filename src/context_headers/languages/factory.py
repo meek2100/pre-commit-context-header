@@ -5,13 +5,21 @@ from pathlib import Path
 from ..config import COMMENT_STYLES
 from .base import HeaderStrategy
 from .strategies import (
-    DefaultStrategy,
     PythonStrategy,
     ShebangStrategy,
     XmlStrategy,
     PhpStrategy,
     FrontmatterStrategy,
 )
+
+# Extensions that need specific strategies
+PYTHON_EXTS = {".py", ".pyi", ".pyw", ".pyx"}
+PHP_EXTS = {".php", ".phtml", ".php3", ".php4", ".phps"}
+FRONTMATTER_EXTS = {".astro", ".md", ".markdown"}
+XML_EXTS = {
+    ".xml", ".html", ".htm", ".xhtml", ".jhtml",
+    ".vue", ".svelte", ".aspx", ".cshtml", ".jsp",
+}
 
 
 def get_strategy_for_file(path_obj: Path) -> HeaderStrategy | None:
@@ -24,6 +32,9 @@ def get_strategy_for_file(path_obj: Path) -> HeaderStrategy | None:
         ext = ".dockerfile"
     else:
         ext = path_obj.suffix.lower()
+        # Handle dotfiles like .bashrc, .zshrc where suffix is empty
+        if not ext and path_obj.name.startswith("."):
+            ext = path_obj.name
 
     # 2. Get Comment Style
     style = COMMENT_STYLES.get(ext)
@@ -31,26 +42,19 @@ def get_strategy_for_file(path_obj: Path) -> HeaderStrategy | None:
         return None
 
     # 3. Select Strategy
-    if ext == ".py":
+    if ext in PYTHON_EXTS:
         return PythonStrategy(style)
 
-    if ext == ".php":
+    if ext in PHP_EXTS:
         return PhpStrategy(style)
 
-    if ext == ".astro":
+    if ext in FRONTMATTER_EXTS:
         return FrontmatterStrategy(style)
 
-    # XML / HTML / Templates
-    if ext in [".xml", ".html", ".vue", ".svelte", ".aspx", ".cshtml"]:
+    if ext in XML_EXTS:
         return XmlStrategy(style)
 
-    # Scripts that support Shebangs
-    if ext in [
-        ".sh", ".bash", ".zsh", ".rb", ".pl", ".js", ".ts", ".mjs", ".cjs",
-        ".ps1", ".lua", ".r", ".tcl", ".awk", ".jl", ".exs", ".dart", ".swift", ".scala",
-        ".dockerfile"
-    ]:
-        return ShebangStrategy(style)
-
-    # Fallback for others (Markdown, CSS, SQL, Configs, etc.)
-    return DefaultStrategy(style)
+    # Fallback to ShebangStrategy for all other supported types.
+    # This handles shell scripts (which need shebang skipping)
+    # and compiled/config languages (where checking for shebang is harmless and returns 0).
+    return ShebangStrategy(style)
