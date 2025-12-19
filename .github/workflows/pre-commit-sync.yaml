@@ -1,0 +1,39 @@
+# File: .github/workflows/pre-commit-sync.yaml
+name: Dependabot Pre-Commit Sync
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: ["dependabot/**"]
+    paths: ["pyproject.toml"]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      - name: Run pre-commit autoupdate
+        run: pre-commit autoupdate
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(deps): sync pre-commit hooks"
+          files: ".pre-commit-config.yaml"
+          commit_author: Dependabot <dependabot@users.noreply.github.com>

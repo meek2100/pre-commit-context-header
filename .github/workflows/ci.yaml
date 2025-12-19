@@ -5,16 +5,41 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
+  lint:
+    name: Lint & Format (Pre-commit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          cache: "pip"
+
+      - name: Cache pre-commit
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Run pre-commit
+        run: |
+          pip install pre-commit
+          pre-commit run --all-files --show-diff-on-failure
+
   test:
     name: Test Python ${{ matrix.python-version }}
-    runs-on: ${{ matrix.os }}
+    needs: lint
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
+        # Testing full range of modern Python versions
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
-        os: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v6
@@ -23,18 +48,19 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-          allow-prereleases: true
+          cache: "pip"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install .[dev]
 
-      - name: Run Linting (Ruff)
-        run: ruff check .
+      - name: Run Tests
+        run: pytest --junitxml=test-results-${{ matrix.python-version }}.xml
 
-      - name: Run Type Checking (Mypy)
-        run: mypy .
-
-      - name: Run Tests with Coverage
-        run: pytest
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: pytest-results-${{ matrix.python-version }}
+          path: test-results-${{ matrix.python-version }}.xml
