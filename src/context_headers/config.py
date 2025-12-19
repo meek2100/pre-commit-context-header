@@ -27,7 +27,6 @@ COMMENT_STYLES: dict[str, str] = {
     ".lua": "-- File: {}",
     ".r": "# File: {}",
     ".awk": "# File: {}",
-
     # Web Frontend & UI
     ".js": "// File: {}",
     ".mjs": "// File: {}",
@@ -58,7 +57,6 @@ COMMENT_STYLES: dict[str, str] = {
     ".wat": ";; File: {}",
     ".md": "<!-- File: {} -->",
     ".markdown": "<!-- File: {} -->",
-
     # Backend & Systems
     ".py": "# File: {}",
     ".pyi": "# File: {}",
@@ -109,7 +107,6 @@ COMMENT_STYLES: dict[str, str] = {
     ".v": "// File: {}",
     ".vsh": "// File: {}",
     ".jl": "# File: {}",
-
     # Ultra-Modern & Emerging
     ".mojo": "# File: {}",
     ".🔥": "# File: {}",
@@ -134,7 +131,6 @@ COMMENT_STYLES: dict[str, str] = {
     ".move": "// File: {}",
     ".talon": "# File: {}",
     ".typ": "// File: {}",
-
     # Infrastructure & Data
     ".tf": "# File: {}",
     ".tfvars": "# File: {}",

@@ -48,7 +48,7 @@ def test_process_file_no_fix_mode(
 
 def test_process_file_binary_skipped(tmp_path: Path) -> None:
     f = tmp_path / "binary.exe"
-    f.write_bytes(b"\x80\x81\x82") # Invalid UTF-8
+    f.write_bytes(b"\x80\x81\x82")  # Invalid UTF-8
 
     # Should return False (skipped)
     assert not process_file(str(f), fix_mode=True)
@@ -72,7 +72,7 @@ def test_process_file_read_oserror(tmp_path: Path) -> None:
 
 def test_process_file_adds_newline_if_missing(tmp_path: Path) -> None:
     f = tmp_path / "no_newline.py"
-    f.write_text("print('hi')", encoding="utf-8") # No \n
+    f.write_text("print('hi')", encoding="utf-8")  # No \n
 
     assert process_file(str(f), fix_mode=True)
 

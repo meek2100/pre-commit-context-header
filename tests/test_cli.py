@@ -34,7 +34,9 @@ def test_cli_with_changes(tmp_path: Path, capsys: pytest.CaptureFixture[str]) ->
     assert f.read_text(encoding="utf-8").startswith("# File:")
 
 
-def test_cli_check_mode_failure(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_cli_check_mode_failure(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     """Test that check mode returns 1 if files need changes."""
     f = tmp_path / "checkfail.py"
     f.write_text("print('fail')", encoding="utf-8")
@@ -45,11 +47,12 @@ def test_cli_check_mode_failure(tmp_path: Path, capsys: pytest.CaptureFixture[st
     out = capsys.readouterr().out
     assert "Missing or incorrect header" in out
 
+
 def test_main_entry_point() -> None:
     """Test the main entry point calls run and exits."""
-    with patch("context_headers.cli.run") as mock_run, \
-         patch("sys.exit") as mock_exit:
+    with patch("context_headers.cli.run") as mock_run, patch("sys.exit") as mock_exit:
         mock_run.return_value = 0
         from context_headers.cli import main
+
         main()
         mock_exit.assert_called_with(0)

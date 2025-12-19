@@ -64,6 +64,7 @@ def test_factory_selects_correct_strategy() -> None:
     assert isinstance(get_strategy_for_file(Path(".bashrc")), ShebangStrategy)
     assert isinstance(get_strategy_for_file(Path(".zprofile")), ShebangStrategy)
 
+
 def test_factory_returns_none_for_unsupported() -> None:
     assert get_strategy_for_file(Path("test.unknown")) is None
     # Binary exclusions
