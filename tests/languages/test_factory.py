@@ -21,6 +21,9 @@ def test_factory_selects_correct_strategy() -> None:
 
     # Check Dockerfile fix
     assert isinstance(get_strategy_for_file(Path("Dockerfile")), ShebangStrategy)
+    # Check Dockerfile variants (New test case)
+    assert isinstance(get_strategy_for_file(Path("Dockerfile.dev")), ShebangStrategy)
+    assert isinstance(get_strategy_for_file(Path("Dockerfile.prod")), ShebangStrategy)
 
     # PHP
     assert isinstance(get_strategy_for_file(Path("test.php")), PhpStrategy)

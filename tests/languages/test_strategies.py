@@ -42,6 +42,19 @@ def test_xml_strategy_skips_declaration() -> None:
     assert strategy.get_insertion_index(lines_no_decl) == 0
 
 
+def test_xml_strategy_skips_doctype() -> None:
+    # New test case for HTML Doctype
+    strategy = XmlStrategy("")
+
+    # Standard HTML5
+    lines = ["<!DOCTYPE html>\n", "<html>\n"]
+    assert strategy.get_insertion_index(lines) == 1
+
+    # Case insensitive
+    lines_lower = ["<!doctype html>\n", "<html>\n"]
+    assert strategy.get_insertion_index(lines_lower) == 1
+
+
 def test_php_strategy_skips_opentag() -> None:
     strategy = PhpStrategy("// File: {}")
 

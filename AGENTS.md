@@ -1,5 +1,3 @@
-<!-- File: AGENTS.md -->
-
 # Developer & AI Agent Guide
 
 **READ THIS FIRST — ALL HUMAN DEVELOPERS AND ALL AI AGENTS MUST FOLLOW THIS DOCUMENT.** **No change, refactor, or feature may violate any principle herein.** **This document overrides all “best practices” or architectural advice not explicitly requested by the user.**
@@ -131,6 +129,7 @@ The application uses a Strategy/Factory pattern to support different file types.
 - **Shebang Preservation:** The tool must **never** insert a header before a Shebang (`#!`).
 - **Encoding Cookie Preservation:** The tool must **never** insert a header before a Python encoding cookie (`# -*- coding: ...`).
 - **XML Declaration Preservation:** The tool must **never** insert a header before `<?xml ... ?>`.
+- **HTML Doctype Preservation:** The tool must **never** insert a header before `<!DOCTYPE ...>`.
 
 ---
 

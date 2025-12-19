@@ -11,6 +11,14 @@ class ShebangStrategy(HeaderStrategy):
     """
 
     def get_insertion_index(self, lines: list[str]) -> int:
+        """Determines insertion index by skipping a Shebang line.
+
+        Args:
+            lines: List of lines in the file.
+
+        Returns:
+            1 if a Shebang is present on the first line, otherwise 0.
+        """
         if not lines:
             return 0
 
@@ -27,6 +35,14 @@ class PythonStrategy(ShebangStrategy):
     """
 
     def get_insertion_index(self, lines: list[str]) -> int:
+        """Determines insertion index skipping Shebangs and encoding cookies.
+
+        Args:
+            lines: List of lines in the file.
+
+        Returns:
+            The line index after any Shebang and/or encoding cookie.
+        """
         idx = super().get_insertion_index(lines)
 
         # Check for encoding cookie in lines [idx ... 1]
@@ -49,14 +65,23 @@ class PythonStrategy(ShebangStrategy):
 class XmlStrategy(HeaderStrategy):
     """
     Strategy for XML-like files.
-    Skips XML declaration (<?xml ... ?>) on the first line.
+    Skips XML declaration (<?xml ... ?>) or HTML Doctype (<!DOCTYPE ...>) on the first line.
     """
 
     def get_insertion_index(self, lines: list[str]) -> int:
+        """Determines insertion index skipping XML declarations or HTML Doctypes.
+
+        Args:
+            lines: List of lines in the file.
+
+        Returns:
+            1 if an XML declaration or Doctype is present on the first line, otherwise 0.
+        """
         if not lines:
             return 0
 
-        if lines[0].strip().startswith("<?xml"):
+        first_line = lines[0].strip()
+        if first_line.startswith("<?xml") or first_line.lower().startswith("<!doctype"):
             return 1
         return 0
 
@@ -68,6 +93,14 @@ class PhpStrategy(ShebangStrategy):
     """
 
     def get_insertion_index(self, lines: list[str]) -> int:
+        """Determines insertion index skipping Shebangs and PHP open tags.
+
+        Args:
+            lines: List of lines in the file.
+
+        Returns:
+            The line index after the PHP open tag, if present.
+        """
         idx = super().get_insertion_index(lines)
 
         if idx < len(lines):
@@ -85,6 +118,14 @@ class FrontmatterStrategy(HeaderStrategy):
     """
 
     def get_insertion_index(self, lines: list[str]) -> int:
+        """Determines insertion index by skipping YAML Frontmatter.
+
+        Args:
+            lines: List of lines in the file.
+
+        Returns:
+            The line index after the closing '---' of the frontmatter, or 0.
+        """
         if not lines:
             return 0
 
