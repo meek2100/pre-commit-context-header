@@ -80,6 +80,7 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 ## E. Test Suite Integrity
 
 - **Coverage:** strict 100% coverage (`--cov-fail-under=100`).
+- **Prohibited Pragmas:** You must NOT use `# pragma: no cover` to silence coverage errors on logic that is reachable. Logic such as bounds clamping or edge case handling must be tested via specific test cases, not ignored.
 - **Idempotency Tests:** Every test case that checks for header insertion **MUST** also verify that running the tool a second time produces no changes.
 - **Fixture Usage:** Use `tmp_path` fixture for all filesystem tests. Do not create files in the actual source tree during testing.
 - **Mocking:** Mock `sys.argv` for CLI tests. Mock `pathlib.Path.stat` for size limit tests.
@@ -139,6 +140,7 @@ The application uses a Strategy/Factory pattern to support different file types.
 - **Encoding Cookie Preservation:** The tool must **never** insert a header before a Python encoding cookie (`# -*- coding: ...`).
 - **XML Declaration Preservation:** The tool must **never** insert a header before `<?xml ... ?>`.
 - **HTML Doctype Preservation:** The tool must **never** insert a header before `<!DOCTYPE ...>`.
+- **Directive Preservation:** The tool must **never** insert a header before ASP/JSP directives (`<%@ ... %>`).
 
 ---
 

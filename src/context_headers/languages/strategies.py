@@ -72,23 +72,23 @@ class PythonStrategy(ShebangStrategy):
 class XmlStrategy(HeaderStrategy):
     """
     Strategy for XML-like files.
-    Skips XML declaration (<?xml ... ?>) or HTML Doctype (<!DOCTYPE ...>) on the first line.
+    Skips XML declaration, HTML Doctype, and ASP/JSP directives on the first line.
     """
 
     def get_insertion_index(self, lines: list[str]) -> int:
-        """Determines insertion index skipping XML declarations or HTML Doctypes.
-
-        Args:
-            lines: List of lines in the file.
-
-        Returns:
-            1 if an XML declaration or Doctype is present on the first line, otherwise 0.
-        """
+        """Determines insertion index skipping declarations."""
         if not lines:
             return 0
 
         first_line = lines[0].strip()
-        if first_line.startswith("<?xml") or first_line.lower().startswith("<!doctype"):
+        lower_line = first_line.lower()
+
+        # Check for XML declaration, HTML Doctype, or ASP/JSP directives (<%@)
+        if (
+            first_line.startswith("<?xml")
+            or lower_line.startswith("<!doctype")
+            or first_line.startswith("<%@")
+        ):
             return 1
         return 0
 

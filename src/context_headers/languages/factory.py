@@ -47,12 +47,14 @@ def get_strategy_for_file(path_obj: Path) -> HeaderStrategy | None:
         is not supported in config.COMMENT_STYLES.
     """
     # 1. Determine Extension / Type
-    # Handle Dockerfile and variants (e.g., Dockerfile.dev, Dockerfile.prod)
-    if path_obj.name == "Dockerfile" or path_obj.name.startswith("Dockerfile."):
+    # Handle Dockerfile and variants (case-insensitive for the main name)
+    name_lower = path_obj.name.lower()
+    if name_lower == "dockerfile" or name_lower.startswith("dockerfile."):
         ext = ".dockerfile"
     else:
         ext = path_obj.suffix.lower()
-        # Handle dotfiles like .bashrc, .zshrc where suffix is empty
+        # Handle dotfiles like .bashrc where suffix might be empty or misleading
+        # depending on pathlib version/platform, ensure we catch the full name.
         if not ext and path_obj.name.startswith("."):
             ext = path_obj.name
 

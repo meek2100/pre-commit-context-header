@@ -25,6 +25,9 @@ def test_factory_selects_correct_strategy() -> None:
     # Check Dockerfile variants
     assert isinstance(get_strategy_for_file(Path("Dockerfile.dev")), ShebangStrategy)
     assert isinstance(get_strategy_for_file(Path("Dockerfile.prod")), ShebangStrategy)
+    # Check Dockerfile case sensitivity
+    assert isinstance(get_strategy_for_file(Path("dockerfile")), ShebangStrategy)
+    assert isinstance(get_strategy_for_file(Path("DOCKERFILE")), ShebangStrategy)
 
     # PHP
     assert isinstance(get_strategy_for_file(Path("test.php")), PhpStrategy)
@@ -52,6 +55,8 @@ def test_factory_selects_correct_strategy() -> None:
     assert isinstance(get_strategy_for_file(Path("test.zig")), ShebangStrategy)
     assert isinstance(get_strategy_for_file(Path("test.v")), ShebangStrategy)
     assert isinstance(get_strategy_for_file(Path("test.nim")), ShebangStrategy)
+    assert isinstance(get_strategy_for_file(Path("test.gleam")), ShebangStrategy)
+    assert isinstance(get_strategy_for_file(Path("test.odin")), ShebangStrategy)
 
     # Config / Infra
     assert isinstance(get_strategy_for_file(Path("test.tf")), ShebangStrategy)
