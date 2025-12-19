@@ -18,7 +18,16 @@ class HeaderStrategy(ABC):
         return self.comment_style.format(clean_path) + "\n"
 
     def is_header_line(self, line: str) -> bool:
-        """Check if a line looks like a context header."""
+        """Check if a line looks like a context header.
+
+        This method includes a global safety check to ensure Shebangs
+        are never misidentified as context headers.
+        """
+        # Safety: A Shebang line is NEVER a context header.
+        # This prevents accidental corruption if a comment style were to look like "#!..."
+        if line.startswith("#!"):
+            return False
+
         if "{}" in self.comment_style:
             prefix, suffix = self.comment_style.split("{}", 1)
         else:

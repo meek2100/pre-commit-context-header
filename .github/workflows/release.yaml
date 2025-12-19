@@ -41,6 +41,42 @@ jobs:
         with:
           python-version: "3.14"
 
+      - name: Verify Versions
+        # This step ensures the Tag, pyproject.toml, and __init__.py are all in sync.
+        # It uses the python environment set up above.
+        run: |
+          python -c '
+          import sys
+          import tomllib
+          from pathlib import Path
+          import re
+
+          # 1. Get Tag Version from Environment
+          ref_name = "${{ github.ref_name }}"  # e.g., "v0.1.0"
+          if not ref_name.startswith("v"):
+              print(f"Error: Ref {ref_name} is not a version tag.")
+              sys.exit(1)
+          tag_ver = ref_name[1:]
+
+          # 2. Get PyProject Version
+          with open("pyproject.toml", "rb") as f:
+              proj_ver = tomllib.load(f)["project"]["version"]
+
+          # 3. Get Init Version
+          init_content = Path("src/context_headers/__init__.py").read_text()
+          match = re.search(r"__version__\s*=\s*\"([^\"]+)\"", init_content)
+          if not match:
+              print("Error: Could not find __version__ in src/context_headers/__init__.py")
+              sys.exit(1)
+          init_ver = match.group(1)
+
+          print(f"Verifying versions:\n  Tag:       {tag_ver}\n  PyProject: {proj_ver}\n  Init:      {init_ver}")
+
+          if not (tag_ver == proj_ver == init_ver):
+              print("::error::Version mismatch detected! Ensure git tag, pyproject.toml, and __init__.py match.")
+              sys.exit(1)
+          '
+
       - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip

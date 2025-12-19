@@ -104,6 +104,22 @@ def test_is_header_line() -> None:
     assert not strategy.is_header_line("# Not a header")
 
 
+def test_base_is_header_line_safety() -> None:
+    """Ensure is_header_line NEVER identifies a Shebang as a header."""
+    # Even if the comment style vaguely resembled a shebang (unlikely),
+    # the safety check in base.py must reject it.
+    strategy = ShebangStrategy("# File: {}")
+
+    # Standard shebangs
+    assert not strategy.is_header_line("#!/bin/bash")
+    assert not strategy.is_header_line("#!/usr/bin/env python")
+
+    # Edge case: Style that looks like shebang components
+    # (Contrived example to prove safety logic)
+    dangerous_strategy = ShebangStrategy("#! {}")
+    assert not dangerous_strategy.is_header_line("#!/bin/bash")
+
+
 def test_strategy_no_placeholder() -> None:
     # Test base class logic for styles without "{}"
     strategy = ShebangStrategy("HEADER")
@@ -136,6 +152,7 @@ def test_markdown_strategy_selection() -> None:
     path = Path("test.markdown")
     strategy = get_strategy_for_file(path)
     assert isinstance(strategy, FrontmatterStrategy)
+    # FIX: Config defines Markdown as ""
     assert strategy.comment_style == ""
 
 
