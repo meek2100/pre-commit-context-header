@@ -24,8 +24,12 @@ class HeaderStrategy(ABC):
         are never misidentified as context headers.
         """
         # Safety: A Shebang line is NEVER a context header.
-        # This prevents accidental corruption if a comment style were to look like "#!..."
         if line.startswith("#!"):
+            return False
+
+        # Safety: If comment style is empty, it would match everything.
+        # This is an invalid state for checking headers.
+        if not self.comment_style:
             return False
 
         if "{}" in self.comment_style:

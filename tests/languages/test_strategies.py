@@ -11,6 +11,7 @@ from context_headers.languages.strategies import (
 
 
 def test_shebang_strategy_skips_shebang() -> None:
+    """Verifies that ShebangStrategy correctly identifies index 1 after a shebang."""
     strategy = ShebangStrategy("# File: {}")
     lines = ["#!/bin/bash\n", "echo 'hello'\n"]
     assert strategy.get_insertion_index(lines) == 1
@@ -24,6 +25,7 @@ def test_shebang_strategy_skips_shebang() -> None:
 
 
 def test_python_strategy_skips_shebang_and_encoding() -> None:
+    """Verifies that PythonStrategy skips both shebangs and PEP 263 encoding cookies."""
     strategy = PythonStrategy("# File: {}")
     lines = [
         "#!/usr/bin/env python3\n",
@@ -34,6 +36,7 @@ def test_python_strategy_skips_shebang_and_encoding() -> None:
 
 
 def test_xml_strategy_skips_declaration() -> None:
+    """Verifies that XmlStrategy skips the XML declaration line."""
     strategy = XmlStrategy("")
     lines = ['<?xml version="1.0"?>\n', "<root></root>\n"]
     assert strategy.get_insertion_index(lines) == 1
@@ -43,7 +46,7 @@ def test_xml_strategy_skips_declaration() -> None:
 
 
 def test_xml_strategy_skips_doctype() -> None:
-    # New test case for HTML Doctype
+    """Verifies that XmlStrategy skips HTML5 DOCTYPE declarations."""
     strategy = XmlStrategy("")
 
     # Standard HTML5
@@ -56,6 +59,7 @@ def test_xml_strategy_skips_doctype() -> None:
 
 
 def test_php_strategy_skips_opentag() -> None:
+    """Verifies that PhpStrategy skips opening PHP tags to insert headers inside the block."""
     strategy = PhpStrategy("// File: {}")
 
     # Case 1: Plain <?php
@@ -76,6 +80,7 @@ def test_php_strategy_skips_opentag() -> None:
 
 
 def test_frontmatter_strategy_skips_block() -> None:
+    """Verifies that FrontmatterStrategy skips the entire YAML frontmatter block."""
     strategy = FrontmatterStrategy("")
 
     # Case 1: Standard Frontmatter
@@ -92,6 +97,7 @@ def test_frontmatter_strategy_skips_block() -> None:
 
 
 def test_strategy_header_generation(tmp_path: Path) -> None:
+    """Verifies that the strategy generates the correct header string from a path."""
     f = tmp_path / "test.py"
     strategy = PythonStrategy("# File: {}")
     expected = f"# File: {f.as_posix()}\n"
@@ -99,6 +105,7 @@ def test_strategy_header_generation(tmp_path: Path) -> None:
 
 
 def test_is_header_line() -> None:
+    """Verifies that is_header_line correctly identifies matching header lines."""
     strategy = ShebangStrategy("# File: {}")
     assert strategy.is_header_line("# File: path/to/file.py")
     assert not strategy.is_header_line("# Not a header")
@@ -106,8 +113,6 @@ def test_is_header_line() -> None:
 
 def test_base_is_header_line_safety() -> None:
     """Ensure is_header_line NEVER identifies a Shebang as a header."""
-    # Even if the comment style vaguely resembled a shebang (unlikely),
-    # the safety check in base.py must reject it.
     strategy = ShebangStrategy("# File: {}")
 
     # Standard shebangs
@@ -115,30 +120,32 @@ def test_base_is_header_line_safety() -> None:
     assert not strategy.is_header_line("#!/usr/bin/env python")
 
     # Edge case: Style that looks like shebang components
-    # (Contrived example to prove safety logic)
     dangerous_strategy = ShebangStrategy("#! {}")
     assert not dangerous_strategy.is_header_line("#!/bin/bash")
 
 
 def test_strategy_no_placeholder() -> None:
-    # Test base class logic for styles without "{}"
+    """Verifies behavior for styles that do not contain the '{}' placeholder."""
     strategy = ShebangStrategy("HEADER")
     assert strategy.get_expected_header(Path("foo")) == "HEADER\n"
     assert strategy.is_header_line("HEADER")
     assert not strategy.is_header_line("OTHER")
 
 
-def test_xml_strategy_empty() -> None:
+def test_xml_strategy_insertion() -> None:
+    """Verifies insertion logic for XML strategy with valid comments."""
     strategy = XmlStrategy("")
     assert strategy.get_insertion_index([]) == 0
 
 
 def test_frontmatter_strategy_empty() -> None:
+    """Verifies insertion logic for Frontmatter strategy on empty files."""
     strategy = FrontmatterStrategy("")
     assert strategy.get_insertion_index([]) == 0
 
 
 def test_python_strategy_skips_cookie_on_second_line_no_shebang() -> None:
+    """Verifies PythonStrategy detects encoding cookies even without a shebang."""
     strategy = PythonStrategy("# File: {}")
     lines = [
         "# Some comment\n",
@@ -149,16 +156,17 @@ def test_python_strategy_skips_cookie_on_second_line_no_shebang() -> None:
 
 
 def test_markdown_strategy_selection() -> None:
+    """Verifies correct strategy and comment style selection for Markdown files."""
     path = Path("test.markdown")
     strategy = get_strategy_for_file(path)
     assert isinstance(strategy, FrontmatterStrategy)
-    # FIX: Config defines Markdown as ""
+    # Config now defines Markdown as HTML comment
     assert strategy.comment_style == ""
 
 
 def test_frontmatter_strategy_only_frontmatter() -> None:
+    """Verifies behavior when a file contains ONLY frontmatter."""
     strategy = FrontmatterStrategy("")
-    # File with ONLY frontmatter
     lines = [
         "---\n",
         "title: hello\n",
