@@ -1,3 +1,4 @@
+<!-- File: AGENTS.md -->
 
 # Developer & AI Agent Guide
 
