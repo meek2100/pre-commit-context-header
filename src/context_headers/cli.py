@@ -21,7 +21,7 @@ def run(argv: list[str] | None = None) -> int:
 
     if files_impacted > 0:
         if args.fix:
-            print(f"\n{files_impacted} files were updated with headers.") # pragma: no cover
+            print(f"\n{files_impacted} files were updated with headers.")
             return 1
         else:
             print(

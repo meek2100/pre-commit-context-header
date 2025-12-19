@@ -1,5 +1,6 @@
 # File: tests/languages/test_strategies.py
 from pathlib import Path
+from context_headers.languages.factory import get_strategy_for_file
 from context_headers.languages.strategies import (
     DefaultStrategy,
     ShebangStrategy,
@@ -112,3 +113,20 @@ def test_xml_strategy_empty() -> None:
 def test_frontmatter_strategy_empty() -> None:
     strategy = FrontmatterStrategy("<!-- File: {} -->")
     assert strategy.get_insertion_index([]) == 0
+
+
+def test_python_strategy_skips_cookie_on_second_line_no_shebang() -> None:
+    strategy = PythonStrategy("# File: {}")
+    lines = [
+        "# Some comment\n",
+        "# -*- coding: utf-8 -*-\n",
+        "print('hello')\n",
+    ]
+    assert strategy.get_insertion_index(lines) == 2
+
+
+def test_markdown_strategy_selection() -> None:
+    path = Path("test.markdown")
+    strategy = get_strategy_for_file(path)
+    assert isinstance(strategy, FrontmatterStrategy)
+    assert strategy.comment_style == "<!-- File: {} -->"
