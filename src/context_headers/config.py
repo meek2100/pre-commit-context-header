@@ -57,6 +57,7 @@ COMMENT_STYLES: dict[str, str] = {
     ".tsx": "// File: {}",
     ".wat": ";; File: {}",
     ".md": "<!-- File: {} -->",
+    ".markdown": "<!-- File: {} -->",
 
     # Backend & Systems
     ".py": "# File: {}",
@@ -64,7 +65,7 @@ COMMENT_STYLES: dict[str, str] = {
     ".pyw": "# File: {}",
     ".pyx": "# File: {}",
     ".java": "// File: {}",
-    ".jsp": "// File: {}",
+    ".jsp": "<%-- File: {} --%>",
     ".cs": "// File: {}",
     ".csx": "// File: {}",
     ".cpp": "// File: {}",

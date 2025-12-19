@@ -1,4 +1,3 @@
-
 # pre-commit-context-header
 
 ![PyPI - Version](https://img.shields.io/pypi/v/pre-commit-context-header)
@@ -16,26 +15,42 @@ While file headers are not required by compilers, they provide critical context 
 
 Add this to your `.pre-commit-config.yaml` in any project:
 
-```yaml
+~~~yaml
 repos:
   - repo: https://github.com/meek2100/pre-commit-context-header
     rev: v0.1.0 # Use the latest tag
     hooks:
       - id: context-headers
         args: [--fix] # Optional: Remove this line if you only want to check, not auto-fix
-```
+~~~
 
 ## Supported File Types
 
-The tool supports context headers for the following file extensions:
+The tool supports context headers for **100+ file extensions**, including:
 
-- **Scripting / Config:** `.py`, `.yaml`, `.yml`, `.sh`, `.bash`, `.zsh`, `.toml`, `.tf`, `.dockerfile` (and `Dockerfile`), `.rb`, `.pl`, `.conf`, `.properties`, `.ini`
-- **Database:** `.sql`
-- **Web / JS:** `.js`, `.ts`, `.jsx`, `.tsx`, `.css`, `.scss`, `.less`, `.vue`
-- **Compiled / Systems:** `.java`, `.kt`, `.rs`, `.go`, `.c`, `.cpp`, `.h`, `.hpp`, `.cs`, `.swift`
-- **Documentation / Markup:** `.html`, `.md`, `.xml`
+### 🐍 Scripting & Shell
+- **Unix:** `.sh`, `.bash`, `.zsh`, `.fish`, `.tcl`, `.awk`, `.pl` (Perl), `.rb` (Ruby), `.lua`
+- **Windows:** `.ps1`, `.psm1` (PowerShell), `.bat`, `.cmd`
+- **Python:** `.py`, `.pyi`, `.pyw`, `.pyx` (plus strict PEP 263 encoding preservation)
 
-For HTML, Markdown, XML, and Vue files, it uses visible comments (e.g., `<!-- File: ... -->`).
+### ☕ Backend & Systems
+- **Major:** `.java`, `.go`, `.rs` (Rust), `.c`, `.cpp`, `.h`, `.hpp`, `.cs` (C#), `.kt` (Kotlin), `.swift`
+- **PHP:** `.php`, `.phtml`, `.phps` (Handles `<?php` and short tags safely)
+- **Functional:** `.ex`, `.exs` (Elixir), `.erl` (Erlang), `.hs` (Haskell), `.cljs` (ClojureScript), `.elm`
+- **Niche/Systems:** `.zig`, `.nim`, `.v` (VLang), `.jl` (Julia), `.dart`, `.sol` (Solidity)
+
+### 🌐 Web & Frontend
+- **JS/TS:** `.js`, `.ts`, `.jsx`, `.tsx`, `.mjs`, `.cjs`
+- **Frameworks:** `.vue`, `.svelte`, `.astro` (Handles Frontmatter), `.aspx`, `.cshtml`, `.jsp`
+- **Styles:** `.css`, `.scss`, `.sass`, `.less`
+
+### 🏗️ Infrastructure & Config
+- **Cloud:** `.tf` (Terraform), `.hcl`, `.bicep`, `.nix`, `.dockerfile`
+- **Data:** `.sql`, `.yaml`, `.yml`, `.toml`, `.json` (excluded by default), `.xml`
+- **Protocols:** `.graphql`, `.proto` (Protobuf), `.prisma`, `.ini`, `.conf`
+
+### 🚀 Emerging & Ultra-Modern
+- **AI/Next-Gen:** `.mojo`, `.carbon`, `.val`, `.gleam`, `.odin`, `.roc`, `.typ` (Typst)
 
 ## Configuration
 
@@ -43,12 +58,12 @@ For HTML, Markdown, XML, and Vue files, it uses visible comments (e.g., `<!-- Fi
 
 To exclude specific files (like minified assets, migrations, or generated documentation) from having headers added, use the `exclude` regex in your `.pre-commit-config.yaml`:
 
-```yaml
+~~~yaml
 hooks:
   - id: context-headers
     args: [--fix]
     exclude: ^(docs/|migrations/|.*\.min\.js)
-```
+~~~
 
 ### Notes
 

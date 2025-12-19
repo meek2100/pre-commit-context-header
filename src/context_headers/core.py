@@ -7,9 +7,15 @@ from .languages.factory import get_strategy_for_file
 
 
 def process_file(filepath: str, fix_mode: bool) -> bool:
-    """
-    Process a single file.
-    Returns True if the file was modified or needs modification.
+    """Processes a single file to enforce context headers.
+
+    Args:
+        filepath: The path to the file to process.
+        fix_mode: Whether to apply fixes (write changes) or just check.
+
+    Returns:
+        True if the file was modified or would be modified (in check mode),
+        False otherwise.
     """
     path_obj = Path(filepath)
 
@@ -56,8 +62,8 @@ def process_file(filepath: str, fix_mode: bool) -> bool:
         elif strategy.is_header_line(current_line):
             header_status = "incorrect"
 
-    if header_status == "correct": # pragma: no cover
-        return False # pragma: no cover
+    if header_status == "correct":
+        return False
 
     # 6. Action
     if not fix_mode:

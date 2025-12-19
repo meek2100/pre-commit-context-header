@@ -38,16 +38,20 @@ class PythonStrategy(ShebangStrategy):
     def get_insertion_index(self, lines: list[str]) -> int:
         idx = super().get_insertion_index(lines)
 
-        # If we are within the first 2 lines, check for encoding cookie
-        if idx < len(lines):
-            line = lines[idx].strip()
+        # Check for encoding cookie in lines [idx ... 1]
+        # Max line to check is index 1 (second line).
+        check_limit = 2
+
+        for i in range(idx, min(len(lines), check_limit)):
+            line = lines[i].strip()
             # Regex approximation of PEP 263
             if (
                 line.startswith("#")
                 and "coding" in line
                 and ("=" in line or ":" in line)
             ):
-                idx += 1
+                return i + 1
+
         return idx
 
 
@@ -62,7 +66,7 @@ class XmlStrategy(HeaderStrategy):
             return 0
 
         if lines[0].strip().startswith("<?xml"):
-            return 1 # pragma: no cover
+            return 1
         return 0
 
 
@@ -98,6 +102,6 @@ class FrontmatterStrategy(HeaderStrategy):
             # Find the closing fence
             for i in range(1, len(lines)):
                 if lines[i].strip() == "---":
-                    return i + 1 # pragma: no cover
+                    return i + 1
 
         return 0

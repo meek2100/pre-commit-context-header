@@ -7,6 +7,15 @@ from .core import process_file
 
 
 def run(argv: list[str] | None = None) -> int:
+    """Executes the CLI application.
+
+    Args:
+        argv: List of command-line arguments. Defaults to None (uses sys.argv).
+
+    Returns:
+        0 if successful (no changes needed or help displayed),
+        1 if changes were made or errors occurred.
+    """
     parser = argparse.ArgumentParser(description="Enforce file path headers.")
     parser.add_argument(
         "--fix", action="store_true", help="Automatically add or update headers."
@@ -21,7 +30,7 @@ def run(argv: list[str] | None = None) -> int:
 
     if files_impacted > 0:
         if args.fix:
-            print(f"\n{files_impacted} files were updated with headers.") # pragma: no cover
+            print(f"\n{files_impacted} files were updated with headers.")
             return 1
         else:
             print(
