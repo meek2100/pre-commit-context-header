@@ -2,19 +2,12 @@
 from pathlib import Path
 from context_headers.languages.factory import get_strategy_for_file
 from context_headers.languages.strategies import (
-    DefaultStrategy,
     ShebangStrategy,
     PythonStrategy,
     XmlStrategy,
     PhpStrategy,
     FrontmatterStrategy,
 )
-
-
-def test_default_strategy_insertion() -> None:
-    strategy = DefaultStrategy("/* File: {} */")
-    lines = ["body { color: red; }\n"]
-    assert strategy.get_insertion_index(lines) == 0
 
 
 def test_shebang_strategy_skips_shebang() -> None:
@@ -24,6 +17,10 @@ def test_shebang_strategy_skips_shebang() -> None:
 
     # Test empty file
     assert strategy.get_insertion_index([]) == 0
+
+    # Test no shebang (acts as default strategy)
+    lines_plain = ["print('hello')\n"]
+    assert strategy.get_insertion_index(lines_plain) == 0
 
 
 def test_python_strategy_skips_shebang_and_encoding() -> None:
@@ -66,7 +63,7 @@ def test_php_strategy_skips_opentag() -> None:
 
 
 def test_frontmatter_strategy_skips_block() -> None:
-    strategy = FrontmatterStrategy("<!-- File: {} -->")
+    strategy = FrontmatterStrategy("")
 
     # Case 1: Standard Frontmatter
     lines = ["---\n", "title: hello\n", "---\n", "<h1>Hi</h1>\n"]
@@ -89,14 +86,14 @@ def test_strategy_header_generation(tmp_path: Path) -> None:
 
 
 def test_is_header_line() -> None:
-    strategy = DefaultStrategy("# File: {}")
+    strategy = ShebangStrategy("# File: {}")
     assert strategy.is_header_line("# File: path/to/file.py")
     assert not strategy.is_header_line("# Not a header")
 
 
 def test_strategy_no_placeholder() -> None:
     # Test base class logic for styles without "{}"
-    strategy = DefaultStrategy("HEADER")
+    strategy = ShebangStrategy("HEADER")
     assert strategy.get_expected_header(Path("foo")) == "HEADER\n"
     assert strategy.is_header_line("HEADER")
     assert not strategy.is_header_line("OTHER")
@@ -108,7 +105,7 @@ def test_xml_strategy_empty() -> None:
 
 
 def test_frontmatter_strategy_empty() -> None:
-    strategy = FrontmatterStrategy("<!-- File: {} -->")
+    strategy = FrontmatterStrategy("")
     assert strategy.get_insertion_index([]) == 0
 
 
@@ -126,11 +123,11 @@ def test_markdown_strategy_selection() -> None:
     path = Path("test.markdown")
     strategy = get_strategy_for_file(path)
     assert isinstance(strategy, FrontmatterStrategy)
-    assert strategy.comment_style == "<!-- File: {} -->"
+    assert strategy.comment_style == ""
 
 
 def test_frontmatter_strategy_only_frontmatter() -> None:
-    strategy = FrontmatterStrategy("<!-- File: {} -->")
+    strategy = FrontmatterStrategy("")
     # File with ONLY frontmatter
     lines = [
         "---\n",

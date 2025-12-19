@@ -31,9 +31,14 @@ XML_EXTS = {
 
 
 def get_strategy_for_file(path_obj: Path) -> HeaderStrategy | None:
-    """
-    Factory function to return the correct strategy for a given file.
-    Returns None if the file type is not supported.
+    """Factory function to return the correct strategy for a given file.
+
+    Args:
+        path_obj: The pathlib.Path object of the file to check.
+
+    Returns:
+        The matching HeaderStrategy instance, or None if the file type
+        is not supported in config.COMMENT_STYLES.
     """
     # 1. Determine Extension / Type
     if path_obj.name == "Dockerfile":

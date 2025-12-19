@@ -3,20 +3,11 @@ from __future__ import annotations
 from .base import HeaderStrategy
 
 
-class DefaultStrategy(HeaderStrategy):
-    """
-    Default strategy: Inserts at line 0.
-    Used for files without special top-of-file requirements (e.g., Markdown, plain text).
-    """
-
-    def get_insertion_index(self, lines: list[str]) -> int:
-        return 0
-
-
 class ShebangStrategy(HeaderStrategy):
     """
     Strategy for scripts that might have a Shebang (#!...) on the first line.
     Used for Shell, Ruby, Perl, Node.js, etc.
+    Also acts as the default strategy (inserts at 0 if no shebang found).
     """
 
     def get_insertion_index(self, lines: list[str]) -> int:
