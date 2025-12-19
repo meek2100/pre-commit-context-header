@@ -127,3 +127,20 @@ def test_process_file_clamps_index(tmp_path: Path) -> None:
         lines = f.read_text(encoding="utf-8").splitlines()
         # Should append at end (index 1, len was 1)
         assert lines[-1] == "# File: ...\n".strip()
+
+
+def test_process_file_skips_unsafe_strategy_return(tmp_path: Path) -> None:
+    """Verifies that process_file returns False when strategy returns -1.
+
+    This ensures that ambiguous files (like PHP files containing only HTML)
+    are skipped to prevent data corruption, covering the safety check in core.py.
+    """
+    f = tmp_path / "ambiguous.php"
+    # PhpStrategy returns -1 if no <?php tag is found
+    f.write_text("<html>No PHP tag here</html>", encoding="utf-8")
+
+    # Should return False (no change made)
+    assert not process_file(str(f), fix_mode=True)
+
+    # File should be unchanged
+    assert f.read_text(encoding="utf-8") == "<html>No PHP tag here</html>"
