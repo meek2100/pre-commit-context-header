@@ -130,3 +130,15 @@ def test_markdown_strategy_selection() -> None:
     strategy = get_strategy_for_file(path)
     assert isinstance(strategy, FrontmatterStrategy)
     assert strategy.comment_style == "<!-- File: {} -->"
+
+
+def test_frontmatter_strategy_only_frontmatter() -> None:
+    strategy = FrontmatterStrategy("<!-- File: {} -->")
+    # File with ONLY frontmatter
+    lines = [
+        "---\n",
+        "title: hello\n",
+        "---\n",
+    ]
+    # Should insert after the block (index 3)
+    assert strategy.get_insertion_index(lines) == 3

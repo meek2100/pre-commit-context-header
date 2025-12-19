@@ -62,8 +62,8 @@ def process_file(filepath: str, fix_mode: bool) -> bool:
         elif strategy.is_header_line(current_line):
             header_status = "incorrect"
 
-    if header_status == "correct": # pragma: no cover
-        return False # pragma: no cover
+    if header_status == "correct":
+        return False
 
     # 6. Action
     if not fix_mode:

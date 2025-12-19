@@ -66,7 +66,7 @@ class XmlStrategy(HeaderStrategy):
             return 0
 
         if lines[0].strip().startswith("<?xml"):
-            return 1 # pragma: no cover
+            return 1
         return 0
 
 
@@ -102,6 +102,6 @@ class FrontmatterStrategy(HeaderStrategy):
             # Find the closing fence
             for i in range(1, len(lines)):
                 if lines[i].strip() == "---":
-                    return i + 1 # pragma: no cover
+                    return i + 1
 
         return 0
