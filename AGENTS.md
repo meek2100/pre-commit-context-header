@@ -41,6 +41,8 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 - `src/context_headers/cli.py` handles argument parsing and exit codes.
 - `src/context_headers/core.py` handles the orchestration of processing a file.
 - `src/context_headers/languages/` contains the Strategy Pattern logic for comment styles.
+- **Entry Points:**
+- `src/context_headers/__main__.py` must exist to support `python -m context_headers` execution.
 
 - **Strategy Pattern:**
 - Language support is implemented using the **Strategy Pattern** (see `src/context_headers/languages/`).
@@ -62,7 +64,7 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 ## C. Documentation & Comment Accuracy
 
 - **Dogfooding:** This project enforces file headers. Therefore, **EVERY** source file in this project (including tests) **MUST** have a valid context header.
-- **Docstrings:** Must follow **Google Style Convention**.
+- **Docstrings:** Must follow **Google Style Convention**, including module-level docstrings for all source files.
 - **Public API:** Any function exposed in `__init__.py` or intended for external use must be fully documented.
 
 ---
@@ -95,6 +97,7 @@ All AI agents must explicitly state **before any code generation**: **“I have 
 - If unsure whether a file type is supported, check `config.py`.
 - If a user asks to add support for a language, you must follow Section H.
 - **Safety First:** If a file has ambiguous content (e.g., binary data disguised as text), the tool should default to **skipping** it rather than corrupting it.
+- **Production Readiness:** Always assume the current date allows for the use of the latest stable tooling (e.g., if today is late 2025, assume `v6` actions are stable) and do not downgrade versions based on stale training data.
 
 ---
 

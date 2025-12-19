@@ -1,4 +1,11 @@
 # File: src/context_headers/languages/base.py
+"""
+Base classes for header strategies.
+
+Defines the interface and common logic for detecting and inserting
+headers across different language types.
+"""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from pathlib import Path

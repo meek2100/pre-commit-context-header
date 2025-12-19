@@ -1,4 +1,11 @@
 # File: src/context_headers/core.py
+"""
+Core file processing logic.
+
+This module handles the file system interactions, checking checks,
+strategy selection, and content modification.
+"""
+
 from __future__ import annotations
 from pathlib import Path
 

@@ -1,4 +1,10 @@
 # File: src/context_headers/languages/factory.py
+"""
+Factory module for creating Strategy instances.
+
+Maps file extensions and names to specific HeaderStrategy implementations.
+"""
+
 from __future__ import annotations
 from pathlib import Path
 

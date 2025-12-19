@@ -1,4 +1,10 @@
 # File: src/context_headers/cli.py
+"""
+Command-line interface entry point.
+
+Handles argument parsing and orchestrates file processing.
+"""
+
 from __future__ import annotations
 import argparse
 import sys

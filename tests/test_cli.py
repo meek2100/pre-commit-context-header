@@ -7,11 +7,16 @@ from context_headers.cli import run
 
 
 def test_cli_help(capsys: pytest.CaptureFixture[str]) -> None:
-    """Test that --help exits with code 0 (argparse behavior)."""
+    """Test that --help exits with code 0 and prints usage."""
     # argparse exits on help, so we still need catches, but we call run()
     with pytest.raises(SystemExit) as e:
         run(["--help"])
     assert e.value.code == 0
+
+    # NEW: Verify help text is actually printed
+    captured = capsys.readouterr()
+    # Argparse usually prints to stdout, but can vary based on version/error
+    assert "usage: " in captured.out or "usage: " in captured.err
 
 
 def test_cli_no_files() -> None:

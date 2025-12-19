@@ -1,4 +1,11 @@
 # File: src/context_headers/languages/strategies.py
+"""
+Specific strategy implementations for different languages.
+
+Contains logic for handling language-specific syntax like Shebangs,
+XML declarations, Frontmatter, etc.
+"""
+
 from __future__ import annotations
 from .base import HeaderStrategy
 

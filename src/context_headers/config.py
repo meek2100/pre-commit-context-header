@@ -1,4 +1,11 @@
 # File: src/context_headers/config.py
+"""
+Configuration constants for pre-commit-context-header.
+
+This module acts as the Single Source of Truth for file size limits,
+supported extensions, and their specific comment styles.
+"""
+
 from __future__ import annotations
 
 # Safety: Do not process files larger than this (1MB) to prevent hangs.
