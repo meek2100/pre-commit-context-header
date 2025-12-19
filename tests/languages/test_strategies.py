@@ -124,6 +124,16 @@ def test_base_is_header_line_safety() -> None:
     assert not dangerous_strategy.is_header_line("#!/bin/bash")
 
 
+def test_header_strategy_safety_empty_style() -> None:
+    """Verifies that is_header_line returns False safely if comment_style is empty.
+
+    This ensures 100% coverage by hitting the safety check in base.py (lines 32-33).
+    """
+    strategy = ShebangStrategy("")
+    # Should return False immediately, not crash or return True
+    assert not strategy.is_header_line("Any line")
+
+
 def test_strategy_no_placeholder() -> None:
     """Verifies behavior for styles that do not contain the '{}' placeholder."""
     strategy = ShebangStrategy("HEADER")
@@ -161,7 +171,7 @@ def test_markdown_strategy_selection() -> None:
     strategy = get_strategy_for_file(path)
     assert isinstance(strategy, FrontmatterStrategy)
     # Config now defines Markdown as HTML comment
-    assert strategy.comment_style == ""
+    assert strategy.comment_style == "<!-- File: {} -->"
 
 
 def test_frontmatter_strategy_only_frontmatter() -> None:
