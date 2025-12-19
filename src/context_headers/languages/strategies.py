@@ -102,11 +102,9 @@ class PhpStrategy(ShebangStrategy):
     def get_insertion_index(self, lines: list[str]) -> int:
         """Determines insertion index skipping Shebangs and PHP open tags.
 
-        Args:
-            lines: List of lines in the file.
-
         Returns:
             The line index after the PHP open tag, if present.
+            Returns -1 if no PHP tag is found, to prevent corrupting HTML-only files.
         """
         idx = super().get_insertion_index(lines)
 
@@ -115,7 +113,12 @@ class PhpStrategy(ShebangStrategy):
             # Check for PHP opening tag
             if line.startswith("<?"):
                 return idx + 1
-        return idx
+
+        # If we are here, we didn't find a PHP opening tag.
+        # Inserting a `//` comment in a file that might be pure HTML
+        # (interpreted by PHP engine) results in visible text on the page.
+        # It is safer to SKIP this file.
+        return -1
 
 
 class FrontmatterStrategy(HeaderStrategy):

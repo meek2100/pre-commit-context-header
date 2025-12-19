@@ -74,9 +74,10 @@ def test_php_strategy_skips_opentag() -> None:
     lines_short = ["<?\n", "echo 1;\n"]
     assert strategy.get_insertion_index(lines_short) == 1
 
-    # Case 4: No tag (HTML)
+    # Case 4: No tag (HTML) -> SHOULD RETURN -1 (Skip)
+    # Inserting // File: ... into HTML is dangerous/visible.
     lines_html = ["<html>\n"]
-    assert strategy.get_insertion_index(lines_html) == 0
+    assert strategy.get_insertion_index(lines_html) == -1
 
 
 def test_frontmatter_strategy_skips_block() -> None:
@@ -127,11 +128,24 @@ def test_base_is_header_line_safety() -> None:
 def test_header_strategy_safety_empty_style() -> None:
     """Verifies that is_header_line returns False safely if comment_style is empty.
 
-    This ensures 100% coverage by hitting the safety check in base.py (lines 32-33).
+    This ensures 100% coverage by hitting the safety check in base.py.
     """
     strategy = ShebangStrategy("")
     # Should return False immediately, not crash or return True
     assert not strategy.is_header_line("Any line")
+
+
+def test_header_strategy_safety_only_placeholders() -> None:
+    """Verifies that checks are strict when style results in empty prefix/suffix.
+
+    If comment_style is "{}", prefix and suffix are empty.
+    lines.startswith("") and endswith("") is always True.
+    This test ensures we have a guard against this.
+    """
+    strategy = ShebangStrategy("{}")
+    # Without the safety guard, this would be True for ANY string.
+    assert not strategy.is_header_line("Any line content")
+    assert not strategy.is_header_line("")
 
 
 def test_strategy_no_placeholder() -> None:

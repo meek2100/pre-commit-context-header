@@ -2,7 +2,7 @@
 """
 Core file processing logic.
 
-This module handles the file system interactions, checking checks,
+This module handles the file system interactions, performing checks,
 strategy selection, and content modification.
 """
 
@@ -50,6 +50,10 @@ def process_file(filepath: str, fix_mode: bool) -> bool:
 
     # 4. Determine Insertion Point via Strategy
     insert_idx = strategy.get_insertion_index(lines)
+
+    # Safety: Strategy requested skip (e.g., ambiguous PHP/HTML)
+    if insert_idx == -1:
+        return False
 
     # Safety: Append newline to last line if missing to prevent concatenation issues
     if lines and not lines[-1].endswith("\n"):

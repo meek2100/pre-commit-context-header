@@ -117,6 +117,11 @@ The application uses a Strategy/Factory pattern to support different file types.
 3. **Update Factory:** Update `get_strategy_for_file` in `src/context_headers/languages/factory.py` to map the extension to the correct Strategy class.
 4. **Add Test:** Create a test case in `tests/languages/test_strategies.py` verifying the insertion index is correct for that language.
 
+### H.2 Safety Returns (Strategy Pattern)
+
+- **Skip Signals:** If a strategy determines that inserting a header is unsafe (e.g., a `.php` file containing only HTML with no PHP tags), the `get_insertion_index` method **MUST** return `-1`.
+- The `core.py` logic is programmed to handle `-1` by skipping the file gracefully.
+
 ---
 
 ## 1. Core Architecture: The Pre-Commit Constraint
