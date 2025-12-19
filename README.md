@@ -1,3 +1,4 @@
+<!-- File: README.md -->
 
 # pre-commit-context-header
 

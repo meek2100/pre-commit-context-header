@@ -2,7 +2,7 @@
 # Optimized for: pre-commit-context-header
 repos:
   - repo: .
-    rev: HEAD
+    rev: v0.1.0-alpha
     hooks:
       - id: context-headers
         args: [--fix]
