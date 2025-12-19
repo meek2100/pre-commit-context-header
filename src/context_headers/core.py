@@ -49,8 +49,8 @@ def process_file(filepath: str, fix_mode: bool) -> bool:
         lines[-1] += "\n"
 
     # Clamp index
-    if insert_idx > len(lines): # pragma: no cover
-        insert_idx = len(lines) # pragma: no cover
+    if insert_idx > len(lines):  # pragma: no cover
+        insert_idx = len(lines)  # pragma: no cover
 
     # 5. Check Status
     header_status = "missing"

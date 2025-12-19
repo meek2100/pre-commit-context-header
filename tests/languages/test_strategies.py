@@ -69,12 +69,7 @@ def test_frontmatter_strategy_skips_block() -> None:
     strategy = FrontmatterStrategy("<!-- File: {} -->")
 
     # Case 1: Standard Frontmatter
-    lines = [
-        "---\n",
-        "title: hello\n",
-        "---\n",
-        "<h1>Hi</h1>\n"
-    ]
+    lines = ["---\n", "title: hello\n", "---\n", "<h1>Hi</h1>\n"]
     assert strategy.get_insertion_index(lines) == 3
 
     # Case 2: No frontmatter
@@ -106,9 +101,11 @@ def test_strategy_no_placeholder() -> None:
     assert strategy.is_header_line("HEADER")
     assert not strategy.is_header_line("OTHER")
 
+
 def test_xml_strategy_empty() -> None:
     strategy = XmlStrategy("")
     assert strategy.get_insertion_index([]) == 0
+
 
 def test_frontmatter_strategy_empty() -> None:
     strategy = FrontmatterStrategy("<!-- File: {} -->")

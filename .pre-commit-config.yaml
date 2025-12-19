@@ -2,7 +2,7 @@
 # Optimized for: pre-commit-context-header
 repos:
   - repo: .
-    rev: c63b7777fb1872f8aca90718f043f27019723126 # Points to local repository for self-testing
+    rev: HEAD
     hooks:
       - id: context-headers
         args: [--fix]
