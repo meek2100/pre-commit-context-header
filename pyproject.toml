@@ -4,7 +4,7 @@ name = "pre-commit-context-header"
 version = "0.1.0"
 description = "A universal pre-commit utility that enforces file path headers to ensure AI coding agents and LLMs always maintain context."
 authors = [{ name = "meek2100", email = "meek2100@users.noreply.github.com" }]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = []
 
 classifiers = [
@@ -12,7 +12,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -23,7 +22,14 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-cov", "mypy", "ruff", "types-setuptools"]
+dev = [
+    "pytest==9.0.2",
+    "pytest-cov==7.0.0",
+    "ruff==0.14.10",
+    "pre-commit==4.5.1",
+    "mypy==1.19.1",
+    "types-setuptools>=80.9.0",
+]
 
 [project.scripts]
 context-headers = "context_headers.cli:main"
@@ -34,7 +40,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.mypy]
 strict = true
-python_version = "3.9"
+python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 exclude = ["build/"]
@@ -50,7 +56,7 @@ pythonpath = ["src"]
 
 [tool.ruff]
 line-length = 88
-target-version = "py39"
+target-version = "py310"
 
 [tool.coverage.run]
 source = ["src"]

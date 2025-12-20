@@ -1,4 +1,10 @@
 # File: src/context_headers/cli.py
+"""
+Command-line interface entry point.
+
+Handles argument parsing and orchestrates file processing.
+"""
+
 from __future__ import annotations
 import argparse
 import sys
@@ -43,7 +49,3 @@ def run(argv: list[str] | None = None) -> int:
 
 def main() -> None:
     sys.exit(run(sys.argv[1:]))
-
-
-if __name__ == "__main__":
-    main()  # pragma: no cover

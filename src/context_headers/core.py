@@ -1,13 +1,23 @@
 # File: src/context_headers/core.py
+"""
+Core file processing logic.
+
+This module handles the file system interactions, performing checks,
+strategy selection, and content modification.
+"""
+
 from __future__ import annotations
 from pathlib import Path
 
-from .config import MAX_FILE_SIZE_BYTES
+from .config import MAX_FILE_SIZE_BYTES, ALWAYS_SKIP_FILENAMES
 from .languages.factory import get_strategy_for_file
 
 
 def process_file(filepath: str, fix_mode: bool) -> bool:
     """Processes a single file to enforce context headers.
+
+    Files are strictly read as UTF-8. Non-UTF-8 files (binary) are skipped
+    silently to prevent corruption.
 
     Args:
         filepath: The path to the file to process.
@@ -19,7 +29,13 @@ def process_file(filepath: str, fix_mode: bool) -> bool:
     """
     path_obj = Path(filepath)
 
-    # 1. Size Check
+    # 1. Mandatory Exclusion Check
+    # Safety: Skip known lockfiles and other forbidden files immediately.
+    # This takes precedence over size or extension checks.
+    if path_obj.name in ALWAYS_SKIP_FILENAMES:
+        return False
+
+    # 2. Size Check
     try:
         if path_obj.stat().st_size > MAX_FILE_SIZE_BYTES:
             # Silently skip large files
@@ -27,32 +43,36 @@ def process_file(filepath: str, fix_mode: bool) -> bool:
     except (OSError, PermissionError):
         return False
 
-    # 2. Strategy Selection
+    # 3. Strategy Selection
     strategy = get_strategy_for_file(path_obj)
     if not strategy:
         return False
 
     expected_header = strategy.get_expected_header(path_obj)
 
-    # 3. Read Content
+    # 4. Read Content
     try:
         text_content = path_obj.read_text(encoding="utf-8")
         lines = text_content.splitlines(keepends=True)
     except (UnicodeDecodeError, OSError):
         return False
 
-    # 4. Determine Insertion Point via Strategy
+    # 5. Determine Insertion Point via Strategy
     insert_idx = strategy.get_insertion_index(lines)
+
+    # Safety: Strategy requested skip (e.g., ambiguous PHP/HTML)
+    if insert_idx == -1:
+        return False
 
     # Safety: Append newline to last line if missing to prevent concatenation issues
     if lines and not lines[-1].endswith("\n"):
         lines[-1] += "\n"
 
     # Clamp index
-    if insert_idx > len(lines):  # pragma: no cover
-        insert_idx = len(lines)  # pragma: no cover
+    if insert_idx > len(lines):
+        insert_idx = len(lines)
 
-    # 5. Check Status
+    # 6. Check Status
     header_status = "missing"
 
     if len(lines) > insert_idx:
@@ -65,7 +85,7 @@ def process_file(filepath: str, fix_mode: bool) -> bool:
     if header_status == "correct":
         return False
 
-    # 6. Action
+    # 7. Action
     if not fix_mode:
         print(f"Missing or incorrect header: {filepath}")
         return True

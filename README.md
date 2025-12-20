@@ -17,42 +17,55 @@ While file headers are not required by compilers, they provide critical context 
 
 Add this to your `.pre-commit-config.yaml` in any project:
 
-~~~yaml
+```yaml
 repos:
   - repo: https://github.com/meek2100/pre-commit-context-header
     rev: v0.1.0 # Use the latest tag
     hooks:
       - id: context-headers
         args: [--fix] # Optional: Remove this line if you only want to check, not auto-fix
-~~~
+```
 
 ## Supported File Types
 
-The tool supports context headers for **100+ file extensions**, including:
+The tool supports context headers for **200+ file extensions**.
 
-### 🐍 Scripting & Shell
-- **Unix:** `.sh`, `.bash`, `.zsh`, `.fish`, `.tcl`, `.awk`, `.pl` (Perl), `.rb` (Ruby), `.lua`
-- **Windows:** `.ps1`, `.psm1` (PowerShell), `.bat`, `.cmd`
-- **Python:** `.py`, `.pyi`, `.pyw`, `.pyx` (plus strict PEP 263 encoding preservation)
+### 🛠 Python & Scripting
 
-### ☕ Backend & Systems
-- **Major:** `.java`, `.go`, `.rs` (Rust), `.c`, `.cpp`, `.h`, `.hpp`, `.cs` (C#), `.kt` (Kotlin), `.swift`
-- **PHP:** `.php`, `.phtml`, `.phps` (Handles `<?php` and short tags safely)
-- **Functional:** `.ex`, `.exs` (Elixir), `.erl` (Erlang), `.hs` (Haskell), `.cljs` (ClojureScript), `.elm`
-- **Niche/Systems:** `.zig`, `.nim`, `.v` (VLang), `.jl` (Julia), `.dart`, `.sol` (Solidity)
+- **Python:** `.py`, `.pyi`, `.pyw`, `.pyx` (Strict PEP 263 preservation)
+- **Shell:** `.sh`, `.bash`, `.zsh`, `.fish`, `.ksh`, `.csh`, `.tcsh`
+- **Unix Tools:** `.awk`, `.sed`
+- **Dotfiles:** `.bashrc`, `.bash_profile`, `.zshrc`, `.gitignore`, `.dockerignore`, `.editorconfig`
 
-### 🌐 Web & Frontend
-- **JS/TS:** `.js`, `.ts`, `.jsx`, `.tsx`, `.mjs`, `.cjs`
-- **Frameworks:** `.vue`, `.svelte`, `.astro` (Handles Frontmatter), `.aspx`, `.cshtml`, `.jsp`
-- **Styles:** `.css`, `.scss`, `.sass`, `.less`
+### ⚙️ System & Backend
 
-### 🏗️ Infrastructure & Config
-- **Cloud:** `.tf` (Terraform), `.hcl`, `.bicep`, `.nix`, `.dockerfile`
-- **Data:** `.sql`, `.yaml`, `.yml`, `.toml`, `.json` (excluded by default), `.xml`
-- **Protocols:** `.graphql`, `.proto` (Protobuf), `.prisma`, `.ini`, `.conf`
+- **C/C++/Obj-C:** `.c`, `.cpp`, `.h`, `.hpp`, `.cc`, `.cxx`, `.m`, `.mm`
+- **Java/JVM:** `.java`, `.kt` (Kotlin), `.scala`, `.groovy`
+- **Modern:** `.go`, `.rs` (Rust), `.swift`, `.dart`, `.zig`, `.nim`, `.v`, `.jl` (Julia)
+- **Microsoft:** `.cs` (C#), `.fs` (F#), `.bat`, `.cmd`, `.ps1` (PowerShell)
 
-### 🚀 Emerging & Ultra-Modern
-- **AI/Next-Gen:** `.mojo`, `.carbon`, `.val`, `.gleam`, `.odin`, `.roc`, `.typ` (Typst)
+### 🎨 Web & Frontend
+
+- **JavaScript:** `.js`, `.mjs`, `.cjs`
+- **TypeScript:** `.ts`, `.mts`, `.cts`
+- **React:** `.jsx`, `.tsx`
+- **Styles:** `.css`, `.scss`, `.sass`, `.less`, `.styl`
+- **Frameworks:** `.vue`, `.svelte`, `.astro`, `.aspx`, `.cshtml`
+- **WebAssembly:** `.wat`
+
+### 🧱 Config, Data, & Infrastructure
+
+- **Config:** `.yaml`, `.yml`, `.toml`, `.ini`, `.conf`, `.cfg`, `.properties`
+- **Infrastructure:** `.tf` (Terraform), `.hcl`, `.dockerfile`, `.nix`, `.bicep`
+- **Data:** `.sql`, `.graphql`, `.proto` (Protobuf), `.json5`, `.hjson` (Note: Standard `.json` is excluded)
+- **Documentation:** `.md`, `.rst`, `.tex`, `.adoc`
+
+### 🧪 Functional & Scientific
+
+- **Functional:** `.ex` (Elixir), `.erl` (Erlang), `.hs` (Haskell), `.clj` (Clojure), `.elm`, `.ml` (OCaml), `.rkt` (Racket)
+- **Scientific:** `.r`, `.f90` (Fortran)
+
+(See `src/context_headers/config.py` for the complete, authoritative list.)
 
 ## Configuration
 
@@ -60,15 +73,17 @@ The tool supports context headers for **100+ file extensions**, including:
 
 To exclude specific files (like minified assets, migrations, or generated documentation) from having headers added, use the `exclude` regex in your `.pre-commit-config.yaml`:
 
-~~~yaml
+```yaml
 hooks:
   - id: context-headers
     args: [--fix]
     exclude: ^(docs/|migrations/|.*\.min\.js)
-~~~
+```
 
 ### Notes
 
 - **Encoding**: This hook enforces UTF-8 encoding.
 - **Line Endings**: The tool uses Python's universal newline mode and may normalize line endings to the system default of the machine running the hook.
 - **Safety**: Files larger than 1MB are automatically skipped to prevent performance issues.
+- **Safety**: Standard lockfiles (e.g., `package-lock.json`, `Cargo.lock`, `go.sum`) are automatically skipped internally to prevent corruption.
+- **Ambiguity**: `.m` files are assumed to be Objective-C (using `//` comments). MATLAB/Octave users should exclude `.m` files in their pre-commit config to avoid syntax errors.

@@ -1,17 +1,30 @@
 # File: tests/test_cli.py
+"""
+Tests for the Command Line Interface (CLI).
+
+Verifies argument parsing, exit codes, and integration with the core processing logic.
+"""
+
 from __future__ import annotations
 import pytest
+import sys
+import runpy
 from pathlib import Path
 from unittest.mock import patch
 from context_headers.cli import run
 
 
 def test_cli_help(capsys: pytest.CaptureFixture[str]) -> None:
-    """Test that --help exits with code 0 (argparse behavior)."""
+    """Test that --help exits with code 0 and prints usage."""
     # argparse exits on help, so we still need catches, but we call run()
     with pytest.raises(SystemExit) as e:
         run(["--help"])
     assert e.value.code == 0
+
+    # Verify help text is actually printed
+    captured = capsys.readouterr()
+    # Argparse usually prints to stdout, but can vary based on version/error
+    assert "usage: " in captured.out or "usage: " in captured.err
 
 
 def test_cli_no_files() -> None:
@@ -56,3 +69,17 @@ def test_main_entry_point() -> None:
 
         main()
         mock_exit.assert_called_with(0)
+
+
+def test_main_execution() -> None:
+    """Verifies __main__.py actually runs main().
+
+    This simulates `python -m context_headers` via runpy to ensure
+    the `if __name__ == '__main__':` block in __main__.py is covered.
+    """
+    # We patch sys.argv to simulate a clean run that exits 0 (help)
+    # This prevents the actual run from trying to parse pytest args
+    with patch.object(sys, "argv", ["context-headers", "--help"]):
+        with pytest.raises(SystemExit) as e:
+            runpy.run_module("context_headers", run_name="__main__")
+        assert e.value.code == 0

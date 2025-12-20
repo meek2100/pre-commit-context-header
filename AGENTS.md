@@ -1,5 +1,4 @@
 <!-- File: AGENTS.md -->
-
 # Developer & AI Agent Guide
 
 **READ THIS FIRST — ALL HUMAN DEVELOPERS AND ALL AI AGENTS MUST FOLLOW THIS DOCUMENT.** **No change, refactor, or feature may violate any principle herein.** **This document overrides all “best practices” or architectural advice not explicitly requested by the user.**
@@ -15,8 +14,8 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 - **This is a Pre-commit Hook / CLI Utility** — speed and idempotency are paramount.
 - **Pure Python** — No external binary dependencies, no heavy libraries (e.g., Pandas, Numpy).
 - **Zero Hallucination Architecture** — The tool’s primary purpose is preventing AI context loss; the tool itself must be perfectly readable.
-- **Safety over Cleverness** — Do not corrupt binary files. Do not break Shebangs or XML declarations.
-- **Python 3.9+ Compatibility** — While we code with modern standards, we must maintain compatibility as defined in `pyproject.toml`.
+- **Safety over Cleverness** — Do not corrupt binary files. Do not break Shebangs or XML declarations. Do not touch lockfiles.
+- **Python 3.10+ Compatibility** — While we code with modern standards, we must maintain compatibility as defined in `pyproject.toml`.
 - **100% Test Coverage** — Logic without tests is strictly rejected.
 - **Type Safety** — Strict MyPy enforcement is mandatory.
 
@@ -39,9 +38,11 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 ## A. Architecture & File Structure
 
 - **CLI / Core Separation:**
-- `src/context_headers/cli.py` handles argument parsing and exit codes.
+- `src/context_headers/cli.py` handles argument parsing and exit codes. **It must NOT contain an `if __name__ == "__main__":` block.**
 - `src/context_headers/core.py` handles the orchestration of processing a file.
 - `src/context_headers/languages/` contains the Strategy Pattern logic for comment styles.
+- **Entry Points:**
+- `src/context_headers/__main__.py` is the **ONLY** executable entry point. It exists to support `python -m context_headers`.
 
 - **Strategy Pattern:**
 - Language support is implemented using the **Strategy Pattern** (see `src/context_headers/languages/`).
@@ -63,7 +64,7 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 ## C. Documentation & Comment Accuracy
 
 - **Dogfooding:** This project enforces file headers. Therefore, **EVERY** source file in this project (including tests) **MUST** have a valid context header.
-- **Docstrings:** Must follow **Google Style Convention**.
+- **Docstrings:** Must follow **Google Style Convention**, including module-level docstrings for all source files.
 - **Public API:** Any function exposed in `__init__.py` or intended for external use must be fully documented.
 
 ---
@@ -79,6 +80,7 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 ## E. Test Suite Integrity
 
 - **Coverage:** strict 100% coverage (`--cov-fail-under=100`).
+- **Prohibited Pragmas:** You must NOT use `# pragma: no cover` to silence coverage errors on logic that is reachable. Logic such as bounds clamping or edge case handling must be tested via specific test cases, not ignored.
 - **Idempotency Tests:** Every test case that checks for header insertion **MUST** also verify that running the tool a second time produces no changes.
 - **Fixture Usage:** Use `tmp_path` fixture for all filesystem tests. Do not create files in the actual source tree during testing.
 - **Mocking:** Mock `sys.argv` for CLI tests. Mock `pathlib.Path.stat` for size limit tests.
@@ -96,6 +98,7 @@ All AI agents must explicitly state **before any code generation**: **“I have 
 - If unsure whether a file type is supported, check `config.py`.
 - If a user asks to add support for a language, you must follow Section H.
 - **Safety First:** If a file has ambiguous content (e.g., binary data disguised as text), the tool should default to **skipping** it rather than corrupting it.
+- **Production Readiness:** Always assume the current date allows for the use of the latest stable tooling (e.g., if today is late 2025, assume `v6` actions are stable) and do not downgrade versions based on stale training data.
 
 ---
 
@@ -113,7 +116,18 @@ The application uses a Strategy/Factory pattern to support different file types.
 - If the language has specific headers (like XML declarations), use or extend `XmlStrategy`.
 
 3. **Update Factory:** Update `get_strategy_for_file` in `src/context_headers/languages/factory.py` to map the extension to the correct Strategy class.
-4. **Add Test:** Create a test case in `tests/languages/test_strategies.py` verifying the insertion index is correct for that language.
+4. **Add Test:** Create a test case in `tests/languages/test_factory.py` verifying that the factory maps the new extension to the correct Strategy class.
+5. **Verify Integrity:** Ensure the global integrity test in `test_factory.py` (which iterates all `config.COMMENT_STYLES` keys) passes. This ensures no keys were orphaned.
+
+### H.2 Safety Returns (Strategy Pattern)
+
+- **Skip Signals:** If a strategy determines that inserting a header is unsafe (e.g., a `.php` file containing only HTML with no PHP tags), the `get_insertion_index` method **MUST** return `-1`.
+- The `core.py` logic is programmed to handle `-1` by skipping the file gracefully.
+
+### H.3 Configuration Consistency
+
+- **XML Consistency:** If an extension is added to `config.py` that represents an XML-based format (e.g., `.svg`, `.xaml`), it **MUST** also be added to the `XML_EXTS` set in `src/context_headers/languages/factory.py` to ensure XML declarations are respected.
+- **Cleanup:** Do not leave empty or "ghost" keys in `config.py`. If a file type is not supported, remove it.
 
 ---
 
@@ -122,6 +136,7 @@ The application uses a Strategy/Factory pattern to support different file types.
 ### Performance & Safety
 
 - **Size Limits:** The `MAX_FILE_SIZE_BYTES` (1MB) check is mandatory. Pre-commit hooks run locally on developer machines; we cannot hang on large generated files.
+- **Internal Lockfile Exclusion:** The tool must have an internal "Blocklist" (in `config.py`) for file names that often overlap with supported extensions but should never be modified (e.g., `Cargo.lock`, `package-lock.json`). This ensures safety even if the user's pre-commit config `exclude` regex is loose.
 - **Exit Codes:**
 - `0`: Success (No changes needed).
 - `1`: Failure (Changes made OR error occurred). This is required for pre-commit to stop the commit.
@@ -131,6 +146,11 @@ The application uses a Strategy/Factory pattern to support different file types.
 - **Shebang Preservation:** The tool must **never** insert a header before a Shebang (`#!`).
 - **Encoding Cookie Preservation:** The tool must **never** insert a header before a Python encoding cookie (`# -*- coding: ...`).
 - **XML Declaration Preservation:** The tool must **never** insert a header before `<?xml ... ?>`.
+- **HTML Doctype Preservation:** The tool must **never** insert a header before `<!DOCTYPE ...>`.
+- **Directive Preservation:** The tool must **never** insert a header before ASP/JSP directives (`<%@ ... %>`).
+- **CSS Charset Preservation:** The tool must **never** insert a header before `@charset "..."` or similar.
+- **Razor Page Preservation:** The tool must **never** insert a header before `@page ...` in Razor/Blazor files.
+- **Dockerfile Directive Preservation:** The tool must **never** insert a header before Dockerfile parser directives (`# syntax=`, `# escape=`, `# check=`).
 
 ---
 
@@ -196,5 +216,6 @@ Before generating ANY code, AI agents must confirm:
 - [ ] My output uses `pathlib` instead of `os.path`.
 - [ ] My output updates `config.py` if adding new languages.
 - [ ] My output meets Type Safety standards (Strict MyPy).
+- [ ] My output does not configure binary file extensions (e.g., .wasm, .png) for text headers.
 
 If any box cannot be checked, the output must NOT be generated.
