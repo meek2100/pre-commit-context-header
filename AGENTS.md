@@ -124,6 +124,11 @@ The application uses a Strategy/Factory pattern to support different file types.
 - **Skip Signals:** If a strategy determines that inserting a header is unsafe (e.g., a `.php` file containing only HTML with no PHP tags), the `get_insertion_index` method **MUST** return `-1`.
 - The `core.py` logic is programmed to handle `-1` by skipping the file gracefully.
 
+### H.3 Configuration Consistency
+
+- **XML Consistency:** If an extension is added to `config.py` that represents an XML-based format (e.g., `.svg`, `.xaml`), it **MUST** also be added to the `XML_EXTS` set in `src/context_headers/languages/factory.py` to ensure XML declarations are respected.
+- **Cleanup:** Do not leave empty or "ghost" keys in `config.py`. If a file type is not supported, remove it.
+
 ---
 
 ## 1. Core Architecture: The Pre-Commit Constraint

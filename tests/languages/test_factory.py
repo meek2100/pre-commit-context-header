@@ -47,6 +47,12 @@ def test_factory_selects_correct_strategy() -> None:
     # CSS maps to XmlStrategy (for @charset protection)
     assert isinstance(get_strategy_for_file(Path("test.css")), XmlStrategy)
 
+    # XML-like Safety Checks
+    # These must map to XmlStrategy to prevent header insertion before <?xml ... ?>
+    assert isinstance(get_strategy_for_file(Path("icon.svg")), XmlStrategy)
+    assert isinstance(get_strategy_for_file(Path("ui.xaml")), XmlStrategy)
+    assert isinstance(get_strategy_for_file(Path("transform.xslt")), XmlStrategy)
+
     # Check Dockerfile fix
     assert isinstance(get_strategy_for_file(Path("Dockerfile")), DockerfileStrategy)
     # Check Dockerfile variants

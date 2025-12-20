@@ -36,6 +36,12 @@ XML_EXTS = {
     ".jsp",
     ".css",
     ".razor",
+    # Additional XML-based formats defined in config.py that require declaration skipping
+    ".svg",
+    ".xaml",
+    ".xslt",
+    ".xbl",
+    ".xsp",
 }
 
 

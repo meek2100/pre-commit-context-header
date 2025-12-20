@@ -533,7 +533,6 @@ COMMENT_STYLES: dict[str, str] = {
     ".xbl": "<!-- File: {} -->",
     ".xojo": "// File: {}",
     ".xotcl": "# File: {}",
-    ".xpl": "",
     ".xq": "(: File: {} :)",
     ".xs": "/* File: {} */",
     ".xsp": "<!-- File: {} -->",
