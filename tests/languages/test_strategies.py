@@ -219,7 +219,7 @@ def test_markdown_strategy_selection() -> None:
     strategy = get_strategy_for_file(path)
     assert isinstance(strategy, FrontmatterStrategy)
     # Config now defines Markdown as HTML comment
-    assert strategy.comment_style == ""
+    assert strategy.comment_style == "<!-- File: {} -->"
 
 
 def test_frontmatter_strategy_only_frontmatter() -> None:
