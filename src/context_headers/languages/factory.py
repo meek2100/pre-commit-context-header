@@ -42,6 +42,14 @@ XML_EXTS = {
     ".xslt",
     ".xbl",
     ".xsp",
+    # FIX: Add ColdFusion to prevent Doctype corruption
+    ".cfm",
+    ".cfc",
+    # FIX: Add missing XML types
+    ".plist",
+    ".wxs",
+    ".csproj",
+    ".vbproj",
 }
 
 

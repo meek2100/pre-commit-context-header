@@ -86,6 +86,16 @@ def test_factory_selects_correct_strategy() -> None:
     assert isinstance(get_strategy_for_file(Path("test.razor")), XmlStrategy)
     assert isinstance(get_strategy_for_file(Path("test.cshtml")), XmlStrategy)
 
+    # Verify ColdFusion uses XmlStrategy (Safety Check for Doctype)
+    assert isinstance(get_strategy_for_file(Path("test.cfm")), XmlStrategy)
+    assert isinstance(get_strategy_for_file(Path("test.cfc")), XmlStrategy)
+
+    # Verify new XML types
+    assert isinstance(get_strategy_for_file(Path("info.plist")), XmlStrategy)
+    assert isinstance(get_strategy_for_file(Path("setup.wxs")), XmlStrategy)
+    assert isinstance(get_strategy_for_file(Path("project.csproj")), XmlStrategy)
+    assert isinstance(get_strategy_for_file(Path("project.vbproj")), XmlStrategy)
+
     # Scripts / Shebangs
     assert isinstance(get_strategy_for_file(Path("test.ps1")), ShebangStrategy)
     assert isinstance(get_strategy_for_file(Path("test.lua")), ShebangStrategy)
