@@ -14,7 +14,7 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 - **This is a Pre-commit Hook / CLI Utility** — speed and idempotency are paramount.
 - **Pure Python** — No external binary dependencies, no heavy libraries (e.g., Pandas, Numpy).
 - **Zero Hallucination Architecture** — The tool’s primary purpose is preventing AI context loss; the tool itself must be perfectly readable.
-- **Safety over Cleverness** — Do not corrupt binary files. Do not break Shebangs or XML declarations.
+- **Safety over Cleverness** — Do not corrupt binary files. Do not break Shebangs or XML declarations. Do not touch lockfiles.
 - **Python 3.9+ Compatibility** — While we code with modern standards, we must maintain compatibility as defined in `pyproject.toml`.
 - **100% Test Coverage** — Logic without tests is strictly rejected.
 - **Type Safety** — Strict MyPy enforcement is mandatory.
@@ -131,6 +131,7 @@ The application uses a Strategy/Factory pattern to support different file types.
 ### Performance & Safety
 
 - **Size Limits:** The `MAX_FILE_SIZE_BYTES` (1MB) check is mandatory. Pre-commit hooks run locally on developer machines; we cannot hang on large generated files.
+- **Internal Lockfile Exclusion:** The tool must have an internal "Blocklist" (in `config.py`) for file names that often overlap with supported extensions but should never be modified (e.g., `Cargo.lock`, `package-lock.json`). This ensures safety even if the user's pre-commit config `exclude` regex is loose.
 - **Exit Codes:**
 - `0`: Success (No changes needed).
 - `1`: Failure (Changes made OR error occurred). This is required for pre-commit to stop the commit.

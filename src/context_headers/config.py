@@ -3,13 +3,32 @@
 Configuration constants for pre-commit-context-header.
 
 This module acts as the Single Source of Truth for file size limits,
-supported extensions, and their specific comment styles.
+supported extensions, skipped files, and their specific comment styles.
 """
 
 from __future__ import annotations
 
+__all__ = ["MAX_FILE_SIZE_BYTES", "ALWAYS_SKIP_FILENAMES", "COMMENT_STYLES"]
+
 # Safety: Do not process files larger than this (1MB) to prevent hangs.
 MAX_FILE_SIZE_BYTES = 1024 * 1024
+
+# Safety: Files that should NEVER be touched, even if their extension is supported.
+# This prevents corrupting auto-generated lockfiles that might be parsed as TOML/YAML.
+ALWAYS_SKIP_FILENAMES: set[str] = {
+    "package-lock.json",
+    "yarn.lock",
+    "pnpm-lock.yaml",
+    "npm-shrinkwrap.json",
+    "poetry.lock",
+    "Cargo.lock",
+    "go.sum",
+    "Gemfile.lock",
+    "composer.lock",
+    "mix.lock",
+    "pubspec.lock",
+    "Pipfile.lock",
+}
 
 # Configuration: Comment styles for various extensions.
 # Single Source of Truth.
@@ -514,7 +533,7 @@ COMMENT_STYLES: dict[str, str] = {
     ".xbl": "<!-- File: {} -->",
     ".xojo": "// File: {}",
     ".xotcl": "# File: {}",
-    ".xpl": "<!-- File: {} -->",
+    ".xpl": "",
     ".xq": "(: File: {} :)",
     ".xs": "/* File: {} */",
     ".xsp": "<!-- File: {} -->",

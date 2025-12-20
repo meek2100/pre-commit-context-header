@@ -76,6 +76,16 @@ def test_process_file_stat_oserror(tmp_path: Path) -> None:
         assert not process_file(str(f), fix_mode=True)
 
 
+def test_process_file_permission_error(tmp_path: Path) -> None:
+    """Verifies that PermissionError during stat checks is handled gracefully."""
+    f = tmp_path / "perm_error.py"
+    f.touch()
+    # PermissionError is a subclass of OSError, but we want to ensure
+    # we specifically catch it if logic splits in the future.
+    with patch("pathlib.Path.stat", side_effect=PermissionError):
+        assert not process_file(str(f), fix_mode=True)
+
+
 def test_process_file_read_oserror(tmp_path: Path) -> None:
     """Verifies that OSErrors during file reading are handled gracefully."""
     f = tmp_path / "read_error.py"
@@ -151,3 +161,15 @@ def test_process_file_skips_unsafe_strategy_return(tmp_path: Path) -> None:
 
     # File should be unchanged
     assert f.read_text(encoding="utf-8") == "<html>No PHP tag here</html>"
+
+
+def test_process_file_skips_mandatory_exclusions(tmp_path: Path) -> None:
+    """Verifies that lockfiles (e.g., Cargo.lock) are skipped even if extension matches."""
+    # Cargo.lock is TOML, but we don't want to touch it.
+    f = tmp_path / "Cargo.lock"
+    f.write_text('[package]\nname = "foo"\n', encoding="utf-8")
+
+    assert not process_file(str(f), fix_mode=True)
+
+    # Content should remain untouched
+    assert f.read_text(encoding="utf-8") == '[package]\nname = "foo"\n'
