@@ -15,7 +15,7 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 - **Pure Python** — No external binary dependencies, no heavy libraries (e.g., Pandas, Numpy).
 - **Zero Hallucination Architecture** — The tool’s primary purpose is preventing AI context loss; the tool itself must be perfectly readable.
 - **Safety over Cleverness** — Do not corrupt binary files. Do not break Shebangs or XML declarations. Do not touch lockfiles.
-- **Python 3.9+ Compatibility** — While we code with modern standards, we must maintain compatibility as defined in `pyproject.toml`.
+- **Python 3.10+ Compatibility** — While we code with modern standards, we must maintain compatibility as defined in `pyproject.toml`.
 - **100% Test Coverage** — Logic without tests is strictly rejected.
 - **Type Safety** — Strict MyPy enforcement is mandatory.
 
