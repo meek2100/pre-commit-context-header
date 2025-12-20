@@ -78,6 +78,8 @@ def test_factory_selects_correct_strategy() -> None:
     assert isinstance(get_strategy_for_file(Path("test.toml")), ShebangStrategy)
     assert isinstance(get_strategy_for_file(Path("test.yaml")), ShebangStrategy)
     assert isinstance(get_strategy_for_file(Path("test.bat")), ShebangStrategy)
+    # WebAssembly (Now supported)
+    assert isinstance(get_strategy_for_file(Path("test.wasm")), ShebangStrategy)
 
     # Dotfiles (Explicitly in config or via name)
     assert isinstance(get_strategy_for_file(Path(".bashrc")), ShebangStrategy)
@@ -91,5 +93,3 @@ def test_factory_returns_none_for_unsupported() -> None:
     assert get_strategy_for_file(Path("test.json")) is None
     assert get_strategy_for_file(Path("test.class")) is None
     assert get_strategy_for_file(Path("test.pyc")) is None
-    # .wasm IS supported now (WebAssembly text format uses ;;)
-    # assert get_strategy_for_file(Path("test.wasm")) is None

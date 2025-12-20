@@ -59,4 +59,4 @@ class HeaderStrategy(ABC):
         Should skip things like Shebangs or XML declarations.
         Returns -1 if the file should be skipped (e.g. ambiguous content).
         """
-        pass  # pragma: no cover
+        raise NotImplementedError

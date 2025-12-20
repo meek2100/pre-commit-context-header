@@ -1,9 +1,9 @@
 # File: .github/dependabot.yaml
 version: 2
 updates:
-  # 1. Python Dependencies (Existing)
+  # 1. Python Dependencies
   - package-ecosystem: "pip"
-    # FIX: Point to root where pyproject.toml lives
+    # Point to root where pyproject.toml lives
     directory: "/"
     schedule:
       interval: "weekly"
@@ -15,19 +15,3 @@ updates:
         patterns:
           - "*"
     open-pull-requests-limit: 10
-
-  # 2. JavaScript/Node Dependencies (NEW)
-  - package-ecosystem: "npm"
-    # Point to root where package.json lives
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:10"
-      timezone: "America/Los_Angeles"
-    # Group production and development dependencies
-    groups:
-      js-dependencies:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 5
