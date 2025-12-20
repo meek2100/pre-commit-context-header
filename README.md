@@ -1,4 +1,5 @@
 <!-- File: README.md -->
+
 # pre-commit-context-header
 
 ![PyPI - Version](https://img.shields.io/pypi/v/pre-commit-context-header)
@@ -29,21 +30,21 @@ repos:
 
 The tool supports context headers for **200+ file extensions**.
 
-### 🐍 Python & Scripting
+### 🛠 Python & Scripting
 
 - **Python:** `.py`, `.pyi`, `.pyw`, `.pyx` (Strict PEP 263 preservation)
 - **Shell:** `.sh`, `.bash`, `.zsh`, `.fish`, `.ksh`, `.csh`, `.tcsh`
 - **Unix Tools:** `.awk`, `.sed`
 - **Dotfiles:** `.bashrc`, `.bash_profile`, `.zshrc`, `.gitignore`, `.dockerignore`, `.editorconfig`
 
-### 💻 System & Backend
+### ⚙️ System & Backend
 
-- **C/C++:** `.c`, `.cpp`, `.h`, `.hpp`, `.cc`, `.cxx`
+- **C/C++/Obj-C:** `.c`, `.cpp`, `.h`, `.hpp`, `.cc`, `.cxx`, `.m`, `.mm`
 - **Java/JVM:** `.java`, `.kt` (Kotlin), `.scala`, `.groovy`
 - **Modern:** `.go`, `.rs` (Rust), `.swift`, `.dart`, `.zig`, `.nim`, `.v`, `.jl` (Julia)
 - **Microsoft:** `.cs` (C#), `.fs` (F#), `.bat`, `.cmd`, `.ps1` (PowerShell)
 
-### 🌐 Web & Frontend
+### 🎨 Web & Frontend
 
 - **JavaScript:** `.js`, `.mjs`, `.cjs`
 - **TypeScript:** `.ts`, `.mts`, `.cts`
@@ -52,7 +53,7 @@ The tool supports context headers for **200+ file extensions**.
 - **Frameworks:** `.vue`, `.svelte`, `.astro`, `.aspx`, `.cshtml`
 - **WebAssembly:** `.wasm`, `.wat`
 
-### 🛠️ Config, Data, & Infrastructure
+### 🧱 Config, Data, & Infrastructure
 
 - **Config:** `.yaml`, `.yml`, `.toml`, `.ini`, `.conf`, `.cfg`, `.properties`
 - **Infrastructure:** `.tf` (Terraform), `.hcl`, `.dockerfile`, `.nix`, `.bicep`
@@ -62,7 +63,7 @@ The tool supports context headers for **200+ file extensions**.
 ### 🧪 Functional & Scientific
 
 - **Functional:** `.ex` (Elixir), `.erl` (Erlang), `.hs` (Haskell), `.clj` (Clojure), `.elm`, `.ml` (OCaml), `.rkt` (Racket)
-- **Scientific:** `.r`, `.m` (Octave/Obj-C), `.f90` (Fortran)
+- **Scientific:** `.r`, `.f90` (Fortran)
 
 (See `src/context_headers/config.py` for the complete, authoritative list.)
 

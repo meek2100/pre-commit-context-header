@@ -16,6 +16,7 @@ from .strategies import (
     XmlStrategy,
     PhpStrategy,
     FrontmatterStrategy,
+    DockerfileStrategy,
 )
 
 # Extensions that need specific strategies
@@ -64,6 +65,9 @@ def get_strategy_for_file(path_obj: Path) -> HeaderStrategy | None:
         return None
 
     # 3. Select Strategy
+    if ext == ".dockerfile":
+        return DockerfileStrategy(style)
+
     if ext in PYTHON_EXTS:
         return PythonStrategy(style)
 

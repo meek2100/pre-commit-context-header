@@ -1,4 +1,11 @@
 # File: tests/languages/test_factory.py
+"""
+Tests for the Strategy Factory.
+
+Verifies that the correct strategy class is instantiated for different
+file extensions and naming conventions (e.g., Dockerfiles, Dotfiles).
+"""
+
 from pathlib import Path
 from context_headers.languages.factory import get_strategy_for_file
 from context_headers.languages.strategies import (
@@ -7,6 +14,7 @@ from context_headers.languages.strategies import (
     ShebangStrategy,
     PhpStrategy,
     FrontmatterStrategy,
+    DockerfileStrategy,
 )
 
 
@@ -21,13 +29,15 @@ def test_factory_selects_correct_strategy() -> None:
     assert isinstance(get_strategy_for_file(Path("test.css")), ShebangStrategy)
 
     # Check Dockerfile fix
-    assert isinstance(get_strategy_for_file(Path("Dockerfile")), ShebangStrategy)
+    assert isinstance(get_strategy_for_file(Path("Dockerfile")), DockerfileStrategy)
     # Check Dockerfile variants
-    assert isinstance(get_strategy_for_file(Path("Dockerfile.dev")), ShebangStrategy)
-    assert isinstance(get_strategy_for_file(Path("Dockerfile.prod")), ShebangStrategy)
+    assert isinstance(get_strategy_for_file(Path("Dockerfile.dev")), DockerfileStrategy)
+    assert isinstance(
+        get_strategy_for_file(Path("Dockerfile.prod")), DockerfileStrategy
+    )
     # Check Dockerfile case sensitivity
-    assert isinstance(get_strategy_for_file(Path("dockerfile")), ShebangStrategy)
-    assert isinstance(get_strategy_for_file(Path("DOCKERFILE")), ShebangStrategy)
+    assert isinstance(get_strategy_for_file(Path("dockerfile")), DockerfileStrategy)
+    assert isinstance(get_strategy_for_file(Path("DOCKERFILE")), DockerfileStrategy)
 
     # PHP
     assert isinstance(get_strategy_for_file(Path("test.php")), PhpStrategy)

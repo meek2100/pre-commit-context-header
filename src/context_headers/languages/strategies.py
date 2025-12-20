@@ -35,6 +35,38 @@ class ShebangStrategy(HeaderStrategy):
         return 0
 
 
+class DockerfileStrategy(ShebangStrategy):
+    """
+    Strategy for Dockerfiles.
+    Skips Shebangs (Line 0) AND Parser Directives (syntax=, escape=, check=).
+    Directives must be the very first lines of the file (or immediately after shebang).
+    """
+
+    def get_insertion_index(self, lines: list[str]) -> int:
+        """Determines insertion index skipping parser directives."""
+        # 1. Check for Shebang first (rare but handled by parent)
+        idx = super().get_insertion_index(lines)
+
+        # 2. Skip Parser Directives
+        # Directives must be at the top, but can follow a shebang if valid.
+        while idx < len(lines):
+            line = lines[idx].strip()
+            # Directive format: # directive=value
+            if line.startswith("#"):
+                # Normalize content to check for directive keys
+                # Directives are case-insensitive, but convention is lower.
+                # The strictly supported directives are syntax, escape, check.
+                content = line[1:].strip().lower()
+                if content.startswith(("syntax=", "escape=", "check=")):
+                    idx += 1
+                    continue
+
+            # If we hit a non-directive line (including other comments or whitespace), we stop.
+            break
+
+        return idx
+
+
 class PythonStrategy(ShebangStrategy):
     """
     Python specific strategy.

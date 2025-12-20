@@ -1,4 +1,11 @@
 # File: tests/test_core.py
+"""
+Tests for the core file processing logic.
+
+Verifies file reading/writing, strategy application, idempotency,
+and safety mechanisms like size limits and binary file skipping.
+"""
+
 import pytest
 from pathlib import Path
 from unittest.mock import patch, MagicMock

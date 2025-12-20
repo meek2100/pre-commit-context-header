@@ -1,4 +1,10 @@
 # File: tests/test_version.py
+"""
+Tests for package version consistency.
+
+Ensures the version defined in `__init__.py` matches `pyproject.toml`.
+"""
+
 from __future__ import annotations
 
 import re

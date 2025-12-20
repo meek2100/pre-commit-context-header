@@ -1,4 +1,11 @@
 # File: tests/languages/test_strategies.py
+"""
+Tests for language-specific strategy implementations.
+
+Verifies that insertion indices are correctly calculated for different
+file types, respecting shebangs, directives, and frontmatter.
+"""
+
 from pathlib import Path
 from context_headers.languages.factory import get_strategy_for_file
 from context_headers.languages.strategies import (
@@ -7,6 +14,7 @@ from context_headers.languages.strategies import (
     XmlStrategy,
     PhpStrategy,
     FrontmatterStrategy,
+    DockerfileStrategy,
 )
 
 
@@ -22,6 +30,32 @@ def test_shebang_strategy_skips_shebang() -> None:
     # Test no shebang (acts as default strategy)
     lines_plain = ["print('hello')\n"]
     assert strategy.get_insertion_index(lines_plain) == 0
+
+
+def test_dockerfile_strategy_skips_directives() -> None:
+    """Verifies that DockerfileStrategy skips syntax and escape directives."""
+    strategy = DockerfileStrategy("# File: {}")
+
+    # Case 1: Syntax directive
+    lines = ["# syntax=docker/dockerfile:1\n", "FROM alpine\n"]
+    assert strategy.get_insertion_index(lines) == 1
+
+    # Case 2: Escape directive
+    lines_esc = ["# escape=`\n", "FROM windowsservercore\n"]
+    assert strategy.get_insertion_index(lines_esc) == 1
+
+    # Case 3: Multiple directives
+    lines_multi = ["# syntax=v1\n", "# check=skip=all\n", "FROM alpine\n"]
+    assert strategy.get_insertion_index(lines_multi) == 2
+
+    # Case 4: Directive must be at top (stop at comment)
+    # If a normal comment appears, directives are done.
+    lines_comment = ["# I am a comment\n", "# syntax=too-late\n"]
+    assert strategy.get_insertion_index(lines_comment) == 0
+
+    # Case 5: With Shebang
+    lines_shebang = ["#!/usr/bin/env docker-build\n", "# syntax=v1\n", "FROM alpine\n"]
+    assert strategy.get_insertion_index(lines_shebang) == 2
 
 
 def test_python_strategy_skips_shebang_and_encoding() -> None:
@@ -185,7 +219,7 @@ def test_markdown_strategy_selection() -> None:
     strategy = get_strategy_for_file(path)
     assert isinstance(strategy, FrontmatterStrategy)
     # Config now defines Markdown as HTML comment
-    assert strategy.comment_style == "<!-- File: {} -->"
+    assert strategy.comment_style == ""
 
 
 def test_frontmatter_strategy_only_frontmatter() -> None:

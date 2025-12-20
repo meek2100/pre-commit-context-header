@@ -1,4 +1,10 @@
 # File: tests/test_cli.py
+"""
+Tests for the Command Line Interface (CLI).
+
+Verifies argument parsing, exit codes, and integration with the core processing logic.
+"""
+
 from __future__ import annotations
 import pytest
 from pathlib import Path
