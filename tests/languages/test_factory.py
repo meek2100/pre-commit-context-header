@@ -64,6 +64,10 @@ def test_factory_selects_correct_strategy() -> None:
     assert isinstance(get_strategy_for_file(Path("dockerfile")), DockerfileStrategy)
     assert isinstance(get_strategy_for_file(Path("DOCKERFILE")), DockerfileStrategy)
 
+    # Check Makefile fix
+    assert isinstance(get_strategy_for_file(Path("Makefile")), ShebangStrategy)
+    assert isinstance(get_strategy_for_file(Path("makefile")), ShebangStrategy)
+
     # PHP (Modern & Legacy)
     assert isinstance(get_strategy_for_file(Path("test.php")), PhpStrategy)
     assert isinstance(get_strategy_for_file(Path("test.phtml")), PhpStrategy)
@@ -103,8 +107,7 @@ def test_factory_selects_correct_strategy() -> None:
     assert isinstance(get_strategy_for_file(Path("test.toml")), ShebangStrategy)
     assert isinstance(get_strategy_for_file(Path("test.yaml")), ShebangStrategy)
     assert isinstance(get_strategy_for_file(Path("test.bat")), ShebangStrategy)
-    # WebAssembly (Now supported)
-    assert isinstance(get_strategy_for_file(Path("test.wasm")), ShebangStrategy)
+    # Note: .wasm is binary and thus not supported (factory returns None).
 
     # Dotfiles (Explicitly in config or via name)
     assert isinstance(get_strategy_for_file(Path(".bashrc")), ShebangStrategy)

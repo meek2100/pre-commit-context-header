@@ -51,7 +51,7 @@ The tool supports context headers for **200+ file extensions**.
 - **React:** `.jsx`, `.tsx`
 - **Styles:** `.css`, `.scss`, `.sass`, `.less`, `.styl`
 - **Frameworks:** `.vue`, `.svelte`, `.astro`, `.aspx`, `.cshtml`
-- **WebAssembly:** `.wasm`, `.wat`
+- **WebAssembly:** `.wat`
 
 ### 🧱 Config, Data, & Infrastructure
 

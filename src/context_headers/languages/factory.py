@@ -60,6 +60,8 @@ def get_strategy_for_file(path_obj: Path) -> HeaderStrategy | None:
     name_lower = path_obj.name.lower()
     if name_lower == "dockerfile" or name_lower.startswith("dockerfile."):
         ext = ".dockerfile"
+    elif name_lower == "makefile":
+        ext = ".makefile"
     else:
         ext = path_obj.suffix.lower()
         # Handle dotfiles like .bashrc where suffix might be empty or misleading
