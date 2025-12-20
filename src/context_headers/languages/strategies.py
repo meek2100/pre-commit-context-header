@@ -54,10 +54,14 @@ class DockerfileStrategy(ShebangStrategy):
             # Directive format: # directive=value
             if line.startswith("#"):
                 # Normalize content to check for directive keys
-                # Directives are case-insensitive, but convention is lower.
-                # The strictly supported directives are syntax, escape, check.
+                # Directives are case-insensitive.
+                # Format allows spaces: # syntax = docker/dockerfile:1
                 content = line[1:].strip().lower()
-                if content.startswith(("syntax=", "escape=", "check=")):
+
+                # Partition at the first '=' to separate key and value
+                key, sep, _ = content.partition("=")
+
+                if sep and key.strip() in ("syntax", "escape", "check"):
                     idx += 1
                     continue
 
@@ -103,8 +107,9 @@ class PythonStrategy(ShebangStrategy):
 
 class XmlStrategy(HeaderStrategy):
     """
-    Strategy for XML-like files.
-    Skips XML declaration, HTML Doctype, and ASP/JSP directives on the first line.
+    Strategy for Web/XML-like files.
+    Skips XML declaration, HTML Doctype, ASP/JSP directives,
+    CSS @charset, and Razor @page directives on the first line.
     """
 
     def get_insertion_index(self, lines: list[str]) -> int:
@@ -115,11 +120,18 @@ class XmlStrategy(HeaderStrategy):
         first_line = lines[0].strip()
         lower_line = first_line.lower()
 
-        # Check for XML declaration, HTML Doctype, or ASP/JSP directives (<%@)
+        # Check for:
+        # 1. XML declaration: <?xml ...
+        # 2. HTML Doctype: <!DOCTYPE ...
+        # 3. ASP/JSP directives: <%@ ...
+        # 4. CSS Charset: @charset ... (Must be first)
+        # 5. Razor Page: @page ... (Must be first)
         if (
             first_line.startswith("<?xml")
             or lower_line.startswith("<!doctype")
             or first_line.startswith("<%@")
+            or lower_line.startswith("@charset")
+            or lower_line.startswith("@page")
         ):
             return 1
         return 0

@@ -57,6 +57,10 @@ def test_dockerfile_strategy_skips_directives() -> None:
     lines_shebang = ["#!/usr/bin/env docker-build\n", "# syntax=v1\n", "FROM alpine\n"]
     assert strategy.get_insertion_index(lines_shebang) == 2
 
+    # Case 6: Directives with spaces (Robustness)
+    lines_spaces = ["# syntax = docker/dockerfile:1\n", "FROM alpine\n"]
+    assert strategy.get_insertion_index(lines_spaces) == 1
+
 
 def test_python_strategy_skips_shebang_and_encoding() -> None:
     """Verifies that PythonStrategy skips both shebangs and PEP 263 encoding cookies."""
@@ -90,6 +94,23 @@ def test_xml_strategy_skips_doctype() -> None:
     # Case insensitive
     lines_lower = ["<!doctype html>\n", "<html>\n"]
     assert strategy.get_insertion_index(lines_lower) == 1
+
+
+def test_xml_strategy_skips_web_directives() -> None:
+    """Verifies that XmlStrategy skips CSS @charset and Razor @page."""
+    strategy = XmlStrategy("")
+
+    # Case 1: CSS Charset
+    lines_css = ['@charset "UTF-8";\n', "body { color: red; }\n"]
+    assert strategy.get_insertion_index(lines_css) == 1
+
+    # Case 2: Razor Page
+    lines_razor = ['@page "/contact"\n', "<h1>Contact</h1>\n"]
+    assert strategy.get_insertion_index(lines_razor) == 1
+
+    # Case 3: ASP/JSP Directive
+    lines_asp = ['<%@ Page Language="C#" %>\n', "<html>\n"]
+    assert strategy.get_insertion_index(lines_asp) == 1
 
 
 def test_php_strategy_skips_opentag() -> None:

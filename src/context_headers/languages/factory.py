@@ -23,17 +23,19 @@ from .strategies import (
 PYTHON_EXTS = {".py", ".pyi", ".pyw", ".pyx"}
 PHP_EXTS = {".php", ".phtml", ".php3", ".php4", ".phps"}
 FRONTMATTER_EXTS = {".astro", ".md", ".markdown"}
+# XML_EXTS includes Web types that need protection for @charset, @page, etc.
 XML_EXTS = {
     ".xml",
     ".html",
     ".htm",
     ".xhtml",
-    ".jhtml",
     ".vue",
     ".svelte",
     ".aspx",
     ".cshtml",
     ".jsp",
+    ".css",
+    ".razor",
 }
 
 

@@ -141,6 +141,8 @@ The application uses a Strategy/Factory pattern to support different file types.
 - **XML Declaration Preservation:** The tool must **never** insert a header before `<?xml ... ?>`.
 - **HTML Doctype Preservation:** The tool must **never** insert a header before `<!DOCTYPE ...>`.
 - **Directive Preservation:** The tool must **never** insert a header before ASP/JSP directives (`<%@ ... %>`).
+- **CSS Charset Preservation:** The tool must **never** insert a header before `@charset "..."` or similar.
+- **Razor Page Preservation:** The tool must **never** insert a header before `@page ...` in Razor/Blazor files.
 - **Dockerfile Directive Preservation:** The tool must **never** insert a header before Dockerfile parser directives (`# syntax=`, `# escape=`, `# check=`).
 
 ---
