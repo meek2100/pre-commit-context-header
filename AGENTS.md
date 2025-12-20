@@ -1,4 +1,5 @@
 <!-- File: AGENTS.md -->
+
 # Developer & AI Agent Guide
 
 **READ THIS FIRST — ALL HUMAN DEVELOPERS AND ALL AI AGENTS MUST FOLLOW THIS DOCUMENT.** **No change, refactor, or feature may violate any principle herein.** **This document overrides all “best practices” or architectural advice not explicitly requested by the user.**
@@ -38,11 +39,11 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 ## A. Architecture & File Structure
 
 - **CLI / Core Separation:**
-- `src/context_headers/cli.py` handles argument parsing and exit codes.
+- `src/context_headers/cli.py` handles argument parsing and exit codes. **It must NOT contain an `if __name__ == "__main__":` block.**
 - `src/context_headers/core.py` handles the orchestration of processing a file.
 - `src/context_headers/languages/` contains the Strategy Pattern logic for comment styles.
 - **Entry Points:**
-- `src/context_headers/__main__.py` must exist to support `python -m context_headers` execution.
+- `src/context_headers/__main__.py` is the **ONLY** executable entry point. It exists to support `python -m context_headers`.
 
 - **Strategy Pattern:**
 - Language support is implemented using the **Strategy Pattern** (see `src/context_headers/languages/`).

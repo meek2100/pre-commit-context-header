@@ -7,6 +7,8 @@ Verifies argument parsing, exit codes, and integration with the core processing 
 
 from __future__ import annotations
 import pytest
+import sys
+import runpy
 from pathlib import Path
 from unittest.mock import patch
 from context_headers.cli import run
@@ -19,7 +21,7 @@ def test_cli_help(capsys: pytest.CaptureFixture[str]) -> None:
         run(["--help"])
     assert e.value.code == 0
 
-    # NEW: Verify help text is actually printed
+    # Verify help text is actually printed
     captured = capsys.readouterr()
     # Argparse usually prints to stdout, but can vary based on version/error
     assert "usage: " in captured.out or "usage: " in captured.err
@@ -69,10 +71,15 @@ def test_main_entry_point() -> None:
         mock_exit.assert_called_with(0)
 
 
-def test_main_module_import() -> None:
-    """Verifies that the __main__ module can be imported.
+def test_main_execution() -> None:
+    """Verifies __main__.py actually runs main().
 
-    This ensures that the top-level import statements in src/context_headers/__main__.py
-    are covered by tests, removing the need for 'pragma: no cover'.
+    This simulates `python -m context_headers` via runpy to ensure
+    the `if __name__ == '__main__':` block in __main__.py is covered.
     """
-    import context_headers.__main__  # noqa: F401
+    # We patch sys.argv to simulate a clean run that exits 0 (help)
+    # This prevents the actual run from trying to parse pytest args
+    with patch.object(sys, "argv", ["context-headers", "--help"]):
+        with pytest.raises(SystemExit) as e:
+            runpy.run_module("context_headers", run_name="__main__")
+        assert e.value.code == 0
