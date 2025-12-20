@@ -23,7 +23,14 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-cov", "mypy", "ruff", "types-setuptools"]
+dev = [
+    "pytest==9.0.2",
+    "pytest-cov==7.0.0",
+    "ruff==0.14.10",
+    "pre-commit==4.5.1",
+    "mypy==1.19.1",
+    "types-setuptools==80.9.0.20250822",
+]
 
 [project.scripts]
 context-headers = "context_headers.cli:main"
