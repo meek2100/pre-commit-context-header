@@ -116,7 +116,7 @@ The application uses a Strategy/Factory pattern to support different file types.
 - If the language has specific headers (like XML declarations), use or extend `XmlStrategy`.
 
 3. **Update Factory:** Update `get_strategy_for_file` in `src/context_headers/languages/factory.py` to map the extension to the correct Strategy class.
-4. **Add Test:** Create a test case in `tests/languages/test_strategies.py` verifying the insertion index is correct for that language.
+4. **Add Test:** Create a test case in `tests/languages/test_factory.py` verifying that the factory maps the new extension to the correct Strategy class.
 
 ### H.2 Safety Returns (Strategy Pattern)
 

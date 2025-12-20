@@ -67,3 +67,12 @@ def test_main_entry_point() -> None:
 
         main()
         mock_exit.assert_called_with(0)
+
+
+def test_main_module_import() -> None:
+    """Verifies that the __main__ module can be imported.
+
+    This ensures that the top-level import statements in src/context_headers/__main__.py
+    are covered by tests, removing the need for 'pragma: no cover'.
+    """
+    import context_headers.__main__  # noqa: F401

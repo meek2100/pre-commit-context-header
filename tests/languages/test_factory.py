@@ -39,9 +39,12 @@ def test_factory_selects_correct_strategy() -> None:
     assert isinstance(get_strategy_for_file(Path("dockerfile")), DockerfileStrategy)
     assert isinstance(get_strategy_for_file(Path("DOCKERFILE")), DockerfileStrategy)
 
-    # PHP
+    # PHP (Modern & Legacy)
     assert isinstance(get_strategy_for_file(Path("test.php")), PhpStrategy)
     assert isinstance(get_strategy_for_file(Path("test.phtml")), PhpStrategy)
+    assert isinstance(get_strategy_for_file(Path("test.php3")), PhpStrategy)
+    assert isinstance(get_strategy_for_file(Path("test.php4")), PhpStrategy)
+    assert isinstance(get_strategy_for_file(Path("test.phps")), PhpStrategy)
 
     # Frontmatter
     assert isinstance(get_strategy_for_file(Path("test.astro")), FrontmatterStrategy)

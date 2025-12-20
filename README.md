@@ -1,5 +1,4 @@
 <!-- File: README.md -->
-
 # pre-commit-context-header
 
 ![PyPI - Version](https://img.shields.io/pypi/v/pre-commit-context-header)
