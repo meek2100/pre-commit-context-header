@@ -16,6 +16,9 @@ from .languages.factory import get_strategy_for_file
 def process_file(filepath: str, fix_mode: bool) -> bool:
     """Processes a single file to enforce context headers.
 
+    Files are strictly read as UTF-8. Non-UTF-8 files (binary) are skipped
+    silently to prevent corruption.
+
     Args:
         filepath: The path to the file to process.
         fix_mode: Whether to apply fixes (write changes) or just check.

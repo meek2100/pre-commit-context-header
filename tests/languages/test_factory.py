@@ -7,6 +7,8 @@ file extensions and naming conventions (e.g., Dockerfiles, Dotfiles).
 """
 
 from pathlib import Path
+from context_headers.config import COMMENT_STYLES
+from context_headers.languages.base import HeaderStrategy
 from context_headers.languages.factory import get_strategy_for_file
 from context_headers.languages.strategies import (
     PythonStrategy,
@@ -16,6 +18,23 @@ from context_headers.languages.strategies import (
     FrontmatterStrategy,
     DockerfileStrategy,
 )
+
+
+def test_factory_supports_all_config_extensions() -> None:
+    """Verifies that EVERY extension in config.py yields a valid strategy."""
+    for ext in COMMENT_STYLES:
+        # Create a dummy path like "test.py", "test.dockerfile", etc.
+        if ext.startswith("."):
+            path = Path(f"test{ext}")
+        else:
+            # Handle unusual keys if any (currently none, but good for future)
+            path = Path(ext)
+
+        strategy = get_strategy_for_file(path)
+        assert strategy is not None, (
+            f"Extension '{ext}' defined in config but factory returned None"
+        )
+        assert isinstance(strategy, HeaderStrategy)
 
 
 def test_factory_selects_correct_strategy() -> None:

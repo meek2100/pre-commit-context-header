@@ -1,5 +1,4 @@
 <!-- File: AGENTS.md -->
-
 # Developer & AI Agent Guide
 
 **READ THIS FIRST — ALL HUMAN DEVELOPERS AND ALL AI AGENTS MUST FOLLOW THIS DOCUMENT.** **No change, refactor, or feature may violate any principle herein.** **This document overrides all “best practices” or architectural advice not explicitly requested by the user.**
@@ -118,6 +117,7 @@ The application uses a Strategy/Factory pattern to support different file types.
 
 3. **Update Factory:** Update `get_strategy_for_file` in `src/context_headers/languages/factory.py` to map the extension to the correct Strategy class.
 4. **Add Test:** Create a test case in `tests/languages/test_factory.py` verifying that the factory maps the new extension to the correct Strategy class.
+5. **Verify Integrity:** Ensure the global integrity test in `test_factory.py` (which iterates all `config.COMMENT_STYLES` keys) passes. This ensures no keys were orphaned.
 
 ### H.2 Safety Returns (Strategy Pattern)
 
