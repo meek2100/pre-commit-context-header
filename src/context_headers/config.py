@@ -246,6 +246,7 @@ COMMENT_STYLES: dict[str, str] = {
     ".coq": "(* File: {} *)",
     ".cor": "'COMMENT' File: {}",
     ".cql": "-- File: {}",
+    ".cshtml": "<!-- File: {} -->",
     ".curry": "-- File: {}",
     ".cw": "; File: {}",
     ".cy": "// File: {}",
