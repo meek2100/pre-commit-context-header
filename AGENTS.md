@@ -210,5 +210,6 @@ Before generating ANY code, AI agents must confirm:
 - [ ] My output uses `pathlib` instead of `os.path`.
 - [ ] My output updates `config.py` if adding new languages.
 - [ ] My output meets Type Safety standards (Strict MyPy).
+- [ ] My output does not configure binary file extensions (e.g., .wasm, .png) for text headers.
 
 If any box cannot be checked, the output must NOT be generated.

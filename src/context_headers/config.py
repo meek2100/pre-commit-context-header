@@ -83,7 +83,6 @@ COMMENT_STYLES: dict[str, str] = {
     ".cfm": "<!-- File: {} -->",
     ".cfc": "<!-- File: {} -->",
     ".astro": "<!-- File: {} -->",  # Frontmatter strategy handles ---, this is fallback/HTML
-    ".wasm": ";; File: {}",
     ".wat": ";; File: {}",
     # --- Backend & Compiled ---
     ".java": "// File: {}",
