@@ -27,9 +27,11 @@ jobs:
           key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
 
       - name: Run pre-commit
+        # We skip 'no-commit-to-branch' in CI because we are often ALREADY on 'main'
+        # during the 'push' event, which would cause a false positive failure.
         run: |
           pip install pre-commit
-          pre-commit run --all-files --show-diff-on-failure
+          SKIP=no-commit-to-branch pre-commit run --all-files --show-diff-on-failure
 
   test:
     name: Test Python ${{ matrix.python-version }}
