@@ -1,4 +1,3 @@
-<!-- File: README.md -->
 # pre-commit-context-header
 
 ![License](https://img.shields.io/github/license/meek2100/pre-commit-context-header)
@@ -29,7 +28,7 @@ You can also run the tool manually (after `pip install pre-commit-context-header
 
 - **`--fix`**: Automatically adds or updates missing headers.
 - **`--remove`**: **Removes** context headers from all targeted files. Useful if you decide to uninstall the tool or need to "reset" files.
-  - _Example:_ `context-headers --remove src/`
+  - _Example:_ `context-headers --remove src/**/*.py`
 
 ## Supported File Types
 
