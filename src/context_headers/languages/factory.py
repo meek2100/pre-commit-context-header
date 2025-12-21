@@ -13,7 +13,7 @@ from .base import HeaderStrategy
 from .strategies import (
     PythonStrategy,
     ShebangStrategy,
-    XmlStrategy,
+    DeclarationStrategy,
     PhpStrategy,
     FrontmatterStrategy,
     DockerfileStrategy,
@@ -23,29 +23,32 @@ from .strategies import (
 PYTHON_EXTS = {".py", ".pyi", ".pyw", ".pyx"}
 PHP_EXTS = {".php", ".phtml", ".php3", ".php4", ".phps"}
 FRONTMATTER_EXTS = {".astro", ".md", ".markdown"}
-# XML_EXTS includes Web types that need protection for @charset, @page, etc.
-XML_EXTS = {
+
+# Extensions that require skipping Top-of-File declarations.
+# This includes XML, HTML, Web Templates (Razor/ASP), CSS (@charset),
+# and Build Configs (MSBuild/WiX).
+DECLARATION_EXTS = {
+    # Web & Markup
     ".xml",
     ".html",
     ".htm",
     ".xhtml",
     ".vue",
     ".svelte",
+    ".css",
+    ".svg",
+    # Server-Side Templates
     ".aspx",
     ".cshtml",
     ".jsp",
-    ".css",
     ".razor",
-    # Additional XML-based formats defined in config.py that require declaration skipping
-    ".svg",
+    ".cfm",
+    ".cfc",
+    # Build & Config
     ".xaml",
     ".xslt",
     ".xbl",
     ".xsp",
-    # FIX: Add ColdFusion to prevent Doctype corruption
-    ".cfm",
-    ".cfc",
-    # FIX: Add missing XML types
     ".plist",
     ".wxs",
     ".csproj",
@@ -95,8 +98,8 @@ def get_strategy_for_file(path_obj: Path) -> HeaderStrategy | None:
     if ext in FRONTMATTER_EXTS:
         return FrontmatterStrategy(style)
 
-    if ext in XML_EXTS:
-        return XmlStrategy(style)
+    if ext in DECLARATION_EXTS:
+        return DeclarationStrategy(style)
 
     # Fallback to ShebangStrategy for all other supported types.
     # This handles shell scripts (which need shebang skipping)

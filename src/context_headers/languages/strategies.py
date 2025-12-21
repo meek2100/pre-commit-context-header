@@ -105,11 +105,17 @@ class PythonStrategy(ShebangStrategy):
         return idx
 
 
-class XmlStrategy(HeaderStrategy):
+class DeclarationStrategy(HeaderStrategy):
     """
-    Strategy for Web/XML-like files.
-    Skips XML declaration, HTML Doctype, ASP/JSP directives,
-    CSS @charset, and Razor @page directives on the first line.
+    Strategy for files requiring Top-of-File Declarations.
+    Used for XML, HTML, CSS, Razor, and ASP/JSP.
+
+    Skips:
+    - XML declaration (<?xml ...)
+    - HTML Doctype (<!DOCTYPE ...)
+    - ASP/JSP directives (<%@ ...)
+    - CSS Charset (@charset ...)
+    - Razor Page directives (@page ...)
     """
 
     def get_insertion_index(self, lines: list[str]) -> int:

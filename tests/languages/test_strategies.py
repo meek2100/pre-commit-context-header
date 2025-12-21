@@ -11,7 +11,7 @@ from context_headers.languages.factory import get_strategy_for_file
 from context_headers.languages.strategies import (
     ShebangStrategy,
     PythonStrategy,
-    XmlStrategy,
+    DeclarationStrategy,
     PhpStrategy,
     FrontmatterStrategy,
     DockerfileStrategy,
@@ -61,6 +61,10 @@ def test_dockerfile_strategy_skips_directives() -> None:
     lines_spaces = ["# syntax = docker/dockerfile:1\n", "FROM alpine\n"]
     assert strategy.get_insertion_index(lines_spaces) == 1
 
+    # Case 7: Check directive (Modern Docker)
+    lines_check = ["# check=skip=all\n", "FROM alpine\n"]
+    assert strategy.get_insertion_index(lines_check) == 1
+
 
 def test_python_strategy_skips_shebang_and_encoding() -> None:
     """Verifies that PythonStrategy skips both shebangs and PEP 263 encoding cookies."""
@@ -73,9 +77,9 @@ def test_python_strategy_skips_shebang_and_encoding() -> None:
     assert strategy.get_insertion_index(lines) == 2
 
 
-def test_xml_strategy_skips_declaration() -> None:
-    """Verifies that XmlStrategy skips the XML declaration line."""
-    strategy = XmlStrategy("")
+def test_declaration_strategy_skips_xml() -> None:
+    """Verifies that DeclarationStrategy skips the XML declaration line."""
+    strategy = DeclarationStrategy("")
     lines = ['<?xml version="1.0"?>\n', "<root></root>\n"]
     assert strategy.get_insertion_index(lines) == 1
 
@@ -83,9 +87,9 @@ def test_xml_strategy_skips_declaration() -> None:
     assert strategy.get_insertion_index(lines_no_decl) == 0
 
 
-def test_xml_strategy_skips_doctype() -> None:
-    """Verifies that XmlStrategy skips HTML5 DOCTYPE declarations."""
-    strategy = XmlStrategy("")
+def test_declaration_strategy_skips_doctype() -> None:
+    """Verifies that DeclarationStrategy skips HTML5 DOCTYPE declarations."""
+    strategy = DeclarationStrategy("")
 
     # Standard HTML5
     lines = ["<!DOCTYPE html>\n", "<html>\n"]
@@ -96,9 +100,9 @@ def test_xml_strategy_skips_doctype() -> None:
     assert strategy.get_insertion_index(lines_lower) == 1
 
 
-def test_xml_strategy_skips_web_directives() -> None:
-    """Verifies that XmlStrategy skips CSS @charset and Razor @page."""
-    strategy = XmlStrategy("")
+def test_declaration_strategy_skips_web_directives() -> None:
+    """Verifies that DeclarationStrategy skips CSS @charset and Razor @page."""
+    strategy = DeclarationStrategy("")
 
     # Case 1: CSS Charset
     lines_css = ['@charset "UTF-8";\n', "body { color: red; }\n"]
@@ -211,9 +215,9 @@ def test_strategy_no_placeholder() -> None:
     assert not strategy.is_header_line("OTHER")
 
 
-def test_xml_strategy_insertion() -> None:
-    """Verifies insertion logic for XML strategy with valid comments."""
-    strategy = XmlStrategy("")
+def test_declaration_strategy_insertion() -> None:
+    """Verifies insertion logic for Declaration strategy with valid comments."""
+    strategy = DeclarationStrategy("")
     assert strategy.get_insertion_index([]) == 0
 
 
