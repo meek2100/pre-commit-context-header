@@ -1,9 +1,6 @@
 <!-- File: README.md -->
-
 # pre-commit-context-header
 
-![PyPI - Version](https://img.shields.io/pypi/v/pre-commit-context-header)
-![Python Versions](https://img.shields.io/pypi/pyversions/pre-commit-context-header)
 ![License](https://img.shields.io/github/license/meek2100/pre-commit-context-header)
 [![CI Status](https://github.com/meek2100/pre-commit-context-header/actions/workflows/ci.yaml/badge.svg)](https://github.com/meek2100/pre-commit-context-header/actions/workflows/ci.yaml)
 
@@ -25,6 +22,14 @@ repos:
       - id: context-headers
         args: [--fix] # Optional: Remove this line if you only want to check, not auto-fix
 ```
+
+### CLI Options
+
+You can also run the tool manually (after `pip install pre-commit-context-header`):
+
+- **`--fix`**: Automatically adds or updates missing headers.
+- **`--remove`**: **Removes** context headers from all targeted files. Useful if you decide to uninstall the tool or need to "reset" files.
+  - _Example:_ `context-headers --remove src/`
 
 ## Supported File Types
 

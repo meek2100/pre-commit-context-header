@@ -20,6 +20,12 @@ classifiers = [
     "Topic :: Software Development :: Quality Assurance",
 ]
 
+[project.urls]
+Homepage = "https://github.com/meek2100/pre-commit-context-header"
+Repository = "https://github.com/meek2100/pre-commit-context-header"
+Issues = "https://github.com/meek2100/pre-commit-context-header/issues"
+Changelog = "https://github.com/meek2100/pre-commit-context-header/releases"
+
 [project.optional-dependencies]
 dev = [
     "pytest==9.0.2",
