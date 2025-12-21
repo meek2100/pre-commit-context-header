@@ -29,6 +29,7 @@ ALWAYS_SKIP_FILENAMES: set[str] = {
     "pnpm-lock.yaml",
     "npm-shrinkwrap.json",
     "poetry.lock",
+    "uv.lock",
     "Cargo.lock",
     "go.sum",
     "Gemfile.lock",

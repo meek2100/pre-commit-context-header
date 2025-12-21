@@ -131,14 +131,6 @@ The application uses a Strategy/Factory pattern to support different file types.
 
 ---
 
-## I. CI/CD & Release Standards
-
-- **Dependency Pinning:** All CI/CD workflows (`.github/workflows/*.yaml`) must use the exact versions defined in `pyproject.toml` (e.g., via `pip install .[dev]`) or explicitly pinned versions for build tools. This prevents "it works on my machine" issues where the CI runner uses a newer, breaking version of a tool.
-- **Deterministic Builds:** Release workflows must be reproducible. Avoid `pip install package` without a version constraint in release pipelines.
-- **Badge Integrity:** Do not display broken badges (red/failing) in `README.md`. Comment them out until the service (like PyPI) is actually live.
-
----
-
 ## 1. Core Architecture: The Pre-Commit Constraint
 
 ### Performance & Safety

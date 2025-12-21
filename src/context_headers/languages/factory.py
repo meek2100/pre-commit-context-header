@@ -39,7 +39,11 @@ def get_strategy_for_file(path_obj: Path) -> HeaderStrategy | None:
     # 1. Determine Extension / Type
     # Handle Dockerfile and variants (case-insensitive for the main name)
     name_lower = path_obj.name.lower()
-    if name_lower == "dockerfile" or name_lower.startswith("dockerfile."):
+    if (
+        name_lower == "dockerfile"
+        or name_lower.startswith("dockerfile.")
+        or name_lower == "containerfile"
+    ):
         ext = ".dockerfile"
     elif name_lower == "makefile":
         ext = ".makefile"

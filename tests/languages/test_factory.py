@@ -130,6 +130,13 @@ def test_factory_selects_correct_strategy() -> None:
     assert isinstance(get_strategy_for_file(Path(".gitignore")), ShebangStrategy)
 
 
+def test_factory_supports_containerfile() -> None:
+    """Verifies that Containerfile is treated as a Dockerfile."""
+    path = Path("Containerfile")
+    strategy = get_strategy_for_file(path)
+    assert isinstance(strategy, DockerfileStrategy)
+
+
 def test_factory_returns_none_for_unsupported() -> None:
     """Verifies that the factory returns None for unsupported or binary files."""
     assert get_strategy_for_file(Path("test.unknown")) is None

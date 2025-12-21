@@ -197,6 +197,14 @@ def test_process_file_skips_mandatory_exclusions(tmp_path: Path) -> None:
     assert f.read_text(encoding="utf-8") == '[package]\nname = "foo"\n'
 
 
+def test_process_file_skips_uv_lock(tmp_path: Path) -> None:
+    """Verifies that uv.lock is skipped as a mandatory exclusion."""
+    f = tmp_path / "uv.lock"
+    f.write_text("version = 1\n", encoding="utf-8")
+    assert not process_file(str(f), fix_mode=True)
+    assert f.read_text(encoding="utf-8") == "version = 1\n"
+
+
 def test_process_file_remove_mode_success(tmp_path: Path) -> None:
     """Verifies that remove_mode=True successfully removes an existing header."""
     f = tmp_path / "remove.py"
