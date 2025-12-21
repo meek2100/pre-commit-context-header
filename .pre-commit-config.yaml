@@ -1,7 +1,7 @@
 # File: .pre-commit-config.yaml
 # Optimized for: pre-commit-context-header
 repos:
-  - repo: .
+  - repo: https://github.com/meek2100/pre-commit-context-header
     rev: v0.1.0
     hooks:
       - id: context-headers
