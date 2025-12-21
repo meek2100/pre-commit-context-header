@@ -12,7 +12,7 @@ from context_headers.languages.base import HeaderStrategy
 from context_headers.languages.factory import get_strategy_for_file
 from context_headers.languages.strategies import (
     PythonStrategy,
-    XmlStrategy,
+    DeclarationStrategy,
     ShebangStrategy,
     PhpStrategy,
     FrontmatterStrategy,
@@ -41,17 +41,19 @@ def test_factory_selects_correct_strategy() -> None:
     """Verifies that the factory returns the correct Strategy class for various extensions."""
     # Existing
     assert isinstance(get_strategy_for_file(Path("test.py")), PythonStrategy)
-    assert isinstance(get_strategy_for_file(Path("test.xml")), XmlStrategy)
+    assert isinstance(get_strategy_for_file(Path("test.xml")), DeclarationStrategy)
     assert isinstance(get_strategy_for_file(Path("test.sh")), ShebangStrategy)
 
-    # CSS maps to XmlStrategy (for @charset protection)
-    assert isinstance(get_strategy_for_file(Path("test.css")), XmlStrategy)
+    # CSS maps to DeclarationStrategy (for @charset protection)
+    assert isinstance(get_strategy_for_file(Path("test.css")), DeclarationStrategy)
 
     # XML-like Safety Checks
-    # These must map to XmlStrategy to prevent header insertion before <?xml ... ?>
-    assert isinstance(get_strategy_for_file(Path("icon.svg")), XmlStrategy)
-    assert isinstance(get_strategy_for_file(Path("ui.xaml")), XmlStrategy)
-    assert isinstance(get_strategy_for_file(Path("transform.xslt")), XmlStrategy)
+    # These must map to DeclarationStrategy to prevent header insertion before <?xml ... ?>
+    assert isinstance(get_strategy_for_file(Path("icon.svg")), DeclarationStrategy)
+    assert isinstance(get_strategy_for_file(Path("ui.xaml")), DeclarationStrategy)
+    assert isinstance(
+        get_strategy_for_file(Path("transform.xslt")), DeclarationStrategy
+    )
 
     # Check Dockerfile fix
     assert isinstance(get_strategy_for_file(Path("Dockerfile")), DockerfileStrategy)
@@ -79,22 +81,26 @@ def test_factory_selects_correct_strategy() -> None:
     assert isinstance(get_strategy_for_file(Path("test.astro")), FrontmatterStrategy)
     assert isinstance(get_strategy_for_file(Path("test.md")), FrontmatterStrategy)
 
-    # XML-like
-    assert isinstance(get_strategy_for_file(Path("test.svelte")), XmlStrategy)
-    assert isinstance(get_strategy_for_file(Path("test.vue")), XmlStrategy)
-    assert isinstance(get_strategy_for_file(Path("test.xhtml")), XmlStrategy)
-    assert isinstance(get_strategy_for_file(Path("test.razor")), XmlStrategy)
-    assert isinstance(get_strategy_for_file(Path("test.cshtml")), XmlStrategy)
+    # Web & Markup (Declaration Strategy)
+    assert isinstance(get_strategy_for_file(Path("test.svelte")), DeclarationStrategy)
+    assert isinstance(get_strategy_for_file(Path("test.vue")), DeclarationStrategy)
+    assert isinstance(get_strategy_for_file(Path("test.xhtml")), DeclarationStrategy)
+    assert isinstance(get_strategy_for_file(Path("test.razor")), DeclarationStrategy)
+    assert isinstance(get_strategy_for_file(Path("test.cshtml")), DeclarationStrategy)
 
-    # Verify ColdFusion uses XmlStrategy (Safety Check for Doctype)
-    assert isinstance(get_strategy_for_file(Path("test.cfm")), XmlStrategy)
-    assert isinstance(get_strategy_for_file(Path("test.cfc")), XmlStrategy)
+    # Verify ColdFusion uses DeclarationStrategy (Safety Check for Doctype)
+    assert isinstance(get_strategy_for_file(Path("test.cfm")), DeclarationStrategy)
+    assert isinstance(get_strategy_for_file(Path("test.cfc")), DeclarationStrategy)
 
     # Verify new XML types
-    assert isinstance(get_strategy_for_file(Path("info.plist")), XmlStrategy)
-    assert isinstance(get_strategy_for_file(Path("setup.wxs")), XmlStrategy)
-    assert isinstance(get_strategy_for_file(Path("project.csproj")), XmlStrategy)
-    assert isinstance(get_strategy_for_file(Path("project.vbproj")), XmlStrategy)
+    assert isinstance(get_strategy_for_file(Path("info.plist")), DeclarationStrategy)
+    assert isinstance(get_strategy_for_file(Path("setup.wxs")), DeclarationStrategy)
+    assert isinstance(
+        get_strategy_for_file(Path("project.csproj")), DeclarationStrategy
+    )
+    assert isinstance(
+        get_strategy_for_file(Path("project.vbproj")), DeclarationStrategy
+    )
 
     # Scripts / Shebangs
     assert isinstance(get_strategy_for_file(Path("test.ps1")), ShebangStrategy)

@@ -23,20 +23,27 @@ def run(argv: list[str] | None = None) -> int:
         1 if changes were made or errors occurred.
     """
     parser = argparse.ArgumentParser(description="Enforce file path headers.")
-    parser.add_argument(
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
         "--fix", action="store_true", help="Automatically add or update headers."
+    )
+    group.add_argument(
+        "--remove", action="store_true", help="Remove context headers from files."
     )
     parser.add_argument("filenames", nargs="*", help="Files to check.")
     args = parser.parse_args(argv)
 
     files_impacted = 0
     for f in args.filenames:
-        if process_file(f, args.fix):
+        if process_file(f, fix_mode=args.fix, remove_mode=args.remove):
             files_impacted += 1
 
     if files_impacted > 0:
         if args.fix:
             print(f"\n{files_impacted} files were updated with headers.")
+            return 1
+        elif args.remove:
+            print(f"\n{files_impacted} files had headers removed.")
             return 1
         else:
             print(

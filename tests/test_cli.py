@@ -61,6 +61,19 @@ def test_cli_check_mode_failure(
     assert "Missing or incorrect header" in out
 
 
+def test_cli_remove_mode(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """Test that --remove successfully removes headers."""
+    f = tmp_path / "remove.py"
+    f.write_text("# File: ...\nprint('hi')\n", encoding="utf-8")
+
+    ret = run(["--remove", str(f)])
+    assert ret == 1
+
+    out = capsys.readouterr().out
+    assert "headers removed" in out
+    assert f.read_text(encoding="utf-8") == "print('hi')\n"
+
+
 def test_main_entry_point() -> None:
     """Test the main entry point calls run and exits."""
     with patch("context_headers.cli.run") as mock_run, patch("sys.exit") as mock_exit:

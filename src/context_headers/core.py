@@ -13,8 +13,8 @@ from .config import MAX_FILE_SIZE_BYTES, ALWAYS_SKIP_FILENAMES
 from .languages.factory import get_strategy_for_file
 
 
-def process_file(filepath: str, fix_mode: bool) -> bool:
-    """Processes a single file to enforce context headers.
+def process_file(filepath: str, fix_mode: bool, remove_mode: bool = False) -> bool:
+    """Processes a single file to enforce or remove context headers.
 
     Files are strictly read as UTF-8. Non-UTF-8 files (binary) are skipped
     silently to prevent corruption.
@@ -22,6 +22,7 @@ def process_file(filepath: str, fix_mode: bool) -> bool:
     Args:
         filepath: The path to the file to process.
         fix_mode: Whether to apply fixes (write changes) or just check.
+        remove_mode: Whether to remove the header if found.
 
     Returns:
         True if the file was modified or would be modified (in check mode),
@@ -48,11 +49,15 @@ def process_file(filepath: str, fix_mode: bool) -> bool:
     if not strategy:
         return False
 
-    expected_header = strategy.get_expected_header(path_obj)
-
     # 4. Read Content
     try:
         text_content = path_obj.read_text(encoding="utf-8")
+
+        # Safety: Check for Byte Order Mark (BOM).
+        # If present, prepending data corrupts the file. We must skip.
+        if text_content.startswith("\ufeff"):
+            return False
+
         lines = text_content.splitlines(keepends=True)
     except (UnicodeDecodeError, OSError):
         return False
@@ -72,20 +77,36 @@ def process_file(filepath: str, fix_mode: bool) -> bool:
     if insert_idx > len(lines):
         insert_idx = len(lines)
 
-    # 6. Check Status
-    header_status = "missing"
-
+    # 6. Check for Existing Header
+    current_header_exists = False
     if len(lines) > insert_idx:
         current_line = lines[insert_idx]
-        if current_line.strip() == expected_header.strip():
+        if strategy.is_header_line(current_line):
+            current_header_exists = True
+
+    # 7. Remove Mode Logic
+    if remove_mode:
+        if current_header_exists:
+            lines.pop(insert_idx)
+            path_obj.write_text("".join(lines), encoding="utf-8")
+            print(f"Removed header: {filepath}")
+            return True
+        return False
+
+    # 8. Check Status (Fix/Check Mode)
+    expected_header = strategy.get_expected_header(path_obj)
+    header_status = "missing"
+
+    if current_header_exists:
+        if lines[insert_idx].strip() == expected_header.strip():
             header_status = "correct"
-        elif strategy.is_header_line(current_line):
+        else:
             header_status = "incorrect"
 
     if header_status == "correct":
         return False
 
-    # 7. Action
+    # 9. Action
     if not fix_mode:
         print(f"Missing or incorrect header: {filepath}")
         return True

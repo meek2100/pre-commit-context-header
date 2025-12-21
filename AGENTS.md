@@ -27,6 +27,7 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 - Do NOT remove the `MAX_FILE_SIZE_BYTES` safety check.
 - Do NOT modify the `HeaderStrategy` inheritance structure without explicit instruction.
 - Do NOT skip strict encoding checks (UTF-8 is the standard).
+- Do NOT corrupt files containing Byte Order Marks (BOM). These files must be skipped.
 - Do NOT introduce "interactive" modes (Pre-commit hooks must run non-interactively).
 
 ### Markdown Formatting Rule (CRITICAL)
@@ -43,12 +44,10 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 - `src/context_headers/languages/` contains the Strategy Pattern logic for comment styles.
 - **Entry Points:**
 - `src/context_headers/__main__.py` is the **ONLY** executable entry point. It exists to support `python -m context_headers`.
-
 - **Strategy Pattern:**
 - Language support is implemented using the **Strategy Pattern** (see `src/context_headers/languages/`).
 - `HeaderStrategy` is the base class.
 - `PythonStrategy`, `XmlStrategy`, etc., handle specific insertion logic (skipping shebangs/declarations).
-
 - **Configuration:**
 - `src/context_headers/config.py` is the Single Source of Truth for constants (e.g., `COMMENT_STYLES`).
 
@@ -56,7 +55,7 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 
 ## B. DRY & Single Source of Truth
 
-- **One place for logic:** Do not duplicate comment style definitions. They belong in `config.py`.
+- **One place for logic:** Do not duplicate comment style definitions OR extension groupings (e.g., `PYTHON_EXTS`). They belong in `config.py`.
 - **One place for file processing:** `core.py:process_file` is the only function that touches the filesystem for reading/writing.
 
 ---
@@ -126,7 +125,8 @@ The application uses a Strategy/Factory pattern to support different file types.
 
 ### H.3 Configuration Consistency
 
-- **XML Consistency:** If an extension is added to `config.py` that represents an XML-based format (e.g., `.svg`, `.xaml`), it **MUST** also be added to the `XML_EXTS` set in `src/context_headers/languages/factory.py` to ensure XML declarations are respected.
+- **XML Consistency:** If an extension is added to `config.py` that represents an XML-based format (e.g., `.svg`, `.xaml`), it **MUST** also be added to the `DECLARATION_EXTS` set in `config.py` to ensure XML declarations are respected.
+- **Grouping Consistency:** All extension groupings (e.g. `PYTHON_EXTS`, `FRONTMATTER_EXTS`) MUST be defined in `config.py` and imported by `factory.py`. Do not define lists of extensions inside `factory.py`.
 - **Cleanup:** Do not leave empty or "ghost" keys in `config.py`. If a file type is not supported, remove it.
 
 ---
@@ -151,6 +151,7 @@ The application uses a Strategy/Factory pattern to support different file types.
 - **CSS Charset Preservation:** The tool must **never** insert a header before `@charset "..."` or similar.
 - **Razor Page Preservation:** The tool must **never** insert a header before `@page ...` in Razor/Blazor files.
 - **Dockerfile Directive Preservation:** The tool must **never** insert a header before Dockerfile parser directives (`# syntax=`, `# escape=`, `# check=`).
+- **BOM Preservation:** The tool must **never** modify files starting with a Byte Order Mark (`\ufeff`) to avoid data corruption.
 
 ---
 
@@ -171,7 +172,7 @@ The application uses a Strategy/Factory pattern to support different file types.
 
 ### Git Hooks
 
-- The `.pre-commit-config.yaml` in the root is for the project's own development. It must always point to the local repo (`repo: .`) to ensure we are testing the current version of the code against itself.
+- The `.pre-commit-config.yaml` in the root is for the project's own development. It must always point to the local repo (`repo: .`) and include a valid `rev` pointing to the current version tag (or commit) to satisfy pre-commit's requirements.
 
 ---
 
