@@ -24,7 +24,8 @@ def test_version_matches_pyproject() -> None:
 
     # We use regex to avoid adding a runtime dependency (tomli/tomllib)
     # just for this single test on older Python versions (3.9/3.10).
-    match = re.search(r'^version\s*=\s*"(.*?)"', content, re.MULTILINE)
+    # Robustness: Matches both "version = '...'" and 'version = "..."'
+    match = re.search(r'^version\s*=\s*["\'](.*?)["\']', content, re.MULTILINE)
 
     assert match is not None, "Could not find version key in pyproject.toml"
     expected_version = match.group(1)

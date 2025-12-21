@@ -77,6 +77,8 @@ class PythonStrategy(ShebangStrategy):
     Skips Shebangs (Line 0) AND Encoding cookies (PEP 263, Line 0 or 1).
     """
 
+    LOOKAHEAD_LIMIT = 2
+
     def get_insertion_index(self, lines: list[str]) -> int:
         """Determines insertion index skipping Shebangs and encoding cookies.
 
@@ -88,11 +90,8 @@ class PythonStrategy(ShebangStrategy):
         """
         idx = super().get_insertion_index(lines)
 
-        # Check for encoding cookie in lines [idx ... 1]
-        # Max line to check is index 1 (second line).
-        check_limit = 2
-
-        for i in range(idx, min(len(lines), check_limit)):
+        # Check for encoding cookie in lines [idx ... limit]
+        for i in range(idx, min(len(lines), self.LOOKAHEAD_LIMIT)):
             line = lines[i].strip()
             # Regex approximation of PEP 263
             if (
@@ -117,6 +116,11 @@ class DeclarationStrategy(HeaderStrategy):
     - CSS Charset (@charset ...)
     - Razor Page directives (@page ...)
     """
+
+    # Safety: Limit lookahead to avoid performance issues on massive files
+    SEARCH_LIMIT = 20
+    # Safety: CSS charsets must be at the very top (first few lines)
+    CSS_SEARCH_LIMIT = 5
 
     def get_insertion_index(self, lines: list[str]) -> int:
         """Determines insertion index skipping declarations.
@@ -148,9 +152,7 @@ class DeclarationStrategy(HeaderStrategy):
                 return 1
 
             # Check subsequent lines (up to limit)
-            # Safety: Limit lookahead to avoid performance issues on massive files
-            check_limit = 20
-            for i in range(1, min(len(lines), check_limit)):
+            for i in range(1, min(len(lines), self.SEARCH_LIMIT)):
                 if ">" in lines[i]:
                     return i + 1
 
@@ -161,7 +163,7 @@ class DeclarationStrategy(HeaderStrategy):
             # Look for closing ';'
             if ";" in first_line:
                 return 1
-            for i in range(1, min(len(lines), 5)):  # CSS charsets shouldn't be long
+            for i in range(1, min(len(lines), self.CSS_SEARCH_LIMIT)):
                 if ";" in lines[i]:
                     return i + 1
             return -1

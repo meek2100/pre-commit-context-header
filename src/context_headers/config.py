@@ -37,6 +37,8 @@ ALWAYS_SKIP_FILENAMES: set[str] = {
     "mix.lock",
     "pubspec.lock",
     "Pipfile.lock",
+    "bun.lockb",  # Binary lockfile (Critical safety)
+    "deno.lock",
 }
 
 # --- Extension Groupings (Single Source of Truth) ---
