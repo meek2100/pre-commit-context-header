@@ -257,3 +257,16 @@ def test_frontmatter_strategy_only_frontmatter() -> None:
     ]
     # Should insert after the block (index 3)
     assert strategy.get_insertion_index(lines) == 3
+
+
+def test_php_strategy_skips_unsafe_content() -> None:
+    """Verifies that PhpStrategy skips XML declarations and one-liners."""
+    strategy = PhpStrategy("// File: {}")
+
+    # Safety: XML Declaration -> Skip
+    assert strategy.get_insertion_index(['<?xml version="1.0"?>\n']) == -1
+    # Case insensitive check
+    assert strategy.get_insertion_index(['<?XML version="1.0"?>\n']) == -1
+
+    # Safety: One-liner -> Skip (inserting after ?> renders as text)
+    assert strategy.get_insertion_index(['<?php echo "hi"; ?>\n']) == -1

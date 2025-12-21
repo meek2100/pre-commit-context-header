@@ -43,12 +43,10 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 - `src/context_headers/languages/` contains the Strategy Pattern logic for comment styles.
 - **Entry Points:**
 - `src/context_headers/__main__.py` is the **ONLY** executable entry point. It exists to support `python -m context_headers`.
-
 - **Strategy Pattern:**
 - Language support is implemented using the **Strategy Pattern** (see `src/context_headers/languages/`).
 - `HeaderStrategy` is the base class.
 - `PythonStrategy`, `XmlStrategy`, etc., handle specific insertion logic (skipping shebangs/declarations).
-
 - **Configuration:**
 - `src/context_headers/config.py` is the Single Source of Truth for constants (e.g., `COMMENT_STYLES`).
 
@@ -171,7 +169,7 @@ The application uses a Strategy/Factory pattern to support different file types.
 
 ### Git Hooks
 
-- The `.pre-commit-config.yaml` in the root is for the project's own development. It must always point to the local repo (`repo: .`) to ensure we are testing the current version of the code against itself.
+- The `.pre-commit-config.yaml` in the root is for the project's own development. It must always point to the local repo (`repo: .`) and include a valid `rev` pointing to the current version tag (or commit) to satisfy pre-commit's requirements.
 
 ---
 
