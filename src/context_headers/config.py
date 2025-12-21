@@ -8,7 +8,15 @@ supported extensions, skipped files, and their specific comment styles.
 
 from __future__ import annotations
 
-__all__ = ["MAX_FILE_SIZE_BYTES", "ALWAYS_SKIP_FILENAMES", "COMMENT_STYLES"]
+__all__ = [
+    "MAX_FILE_SIZE_BYTES",
+    "ALWAYS_SKIP_FILENAMES",
+    "COMMENT_STYLES",
+    "PYTHON_EXTS",
+    "PHP_EXTS",
+    "FRONTMATTER_EXTS",
+    "DECLARATION_EXTS",
+]
 
 # Safety: Do not process files larger than this (1MB) to prevent hangs.
 MAX_FILE_SIZE_BYTES = 1024 * 1024
@@ -28,6 +36,43 @@ ALWAYS_SKIP_FILENAMES: set[str] = {
     "mix.lock",
     "pubspec.lock",
     "Pipfile.lock",
+}
+
+# --- Extension Groupings (Single Source of Truth) ---
+
+PYTHON_EXTS: set[str] = {".py", ".pyi", ".pyw", ".pyx"}
+PHP_EXTS: set[str] = {".php", ".phtml", ".php3", ".php4", ".phps"}
+FRONTMATTER_EXTS: set[str] = {".astro", ".md", ".markdown"}
+
+# Extensions that require skipping Top-of-File declarations.
+# This includes XML, HTML, Web Templates (Razor/ASP), CSS (@charset),
+# and Build Configs (MSBuild/WiX).
+DECLARATION_EXTS: set[str] = {
+    # Web & Markup
+    ".xml",
+    ".html",
+    ".htm",
+    ".xhtml",
+    ".vue",
+    ".svelte",
+    ".css",
+    ".svg",
+    # Server-Side Templates
+    ".aspx",
+    ".cshtml",
+    ".jsp",
+    ".razor",
+    ".cfm",
+    ".cfc",
+    # Build & Config
+    ".xaml",
+    ".xslt",
+    ".xbl",
+    ".xsp",
+    ".plist",
+    ".wxs",
+    ".csproj",
+    ".vbproj",
 }
 
 # Configuration: Comment styles for various extensions.

@@ -119,27 +119,57 @@ class DeclarationStrategy(HeaderStrategy):
     """
 
     def get_insertion_index(self, lines: list[str]) -> int:
-        """Determines insertion index skipping declarations."""
+        """Determines insertion index skipping declarations.
+
+        Safety:
+        - If the declaration spans multiple lines, we attempt to find the end.
+        - If we cannot safely find the end, we return -1 (Skip).
+        """
         if not lines:
             return 0
 
         first_line = lines[0].strip()
         lower_line = first_line.lower()
 
-        # Check for:
-        # 1. XML declaration: <?xml ...
-        # 2. HTML Doctype: <!DOCTYPE ...
-        # 3. ASP/JSP directives: <%@ ...
-        # 4. CSS Charset: @charset ... (Must be first)
-        # 5. Razor Page: @page ... (Must be first)
-        if (
-            first_line.startswith("<?xml")
-            or lower_line.startswith("<!doctype")
-            or first_line.startswith("<%@")
-            or lower_line.startswith("@charset")
-            or lower_line.startswith("@page")
-        ):
+        # Check for specific declaration types
+        is_tag_decl = (
+            first_line.startswith("<?xml")  # <?xml ... ?>
+            or lower_line.startswith("<!doctype")  # <!DOCTYPE ... >
+            or first_line.startswith("<%@")  # <%@ ... %>
+        )
+
+        is_css_decl = lower_line.startswith("@charset")  # @charset "...";
+        is_razor_decl = lower_line.startswith("@page")  # @page ...
+
+        if is_tag_decl:
+            # Look for closing '>'
+            # Check line 0 first
+            if ">" in first_line:
+                return 1
+
+            # Check subsequent lines (up to limit)
+            # Safety: Limit lookahead to avoid performance issues on massive files
+            check_limit = 20
+            for i in range(1, min(len(lines), check_limit)):
+                if ">" in lines[i]:
+                    return i + 1
+
+            # If not closed within limit, skip file (unsafe/ambiguous)
+            return -1
+
+        if is_css_decl:
+            # Look for closing ';'
+            if ";" in first_line:
+                return 1
+            for i in range(1, min(len(lines), 5)):  # CSS charsets shouldn't be long
+                if ";" in lines[i]:
+                    return i + 1
+            return -1
+
+        if is_razor_decl:
+            # Razor @page is typically a single line directive ending at newline.
             return 1
+
         return 0
 
 

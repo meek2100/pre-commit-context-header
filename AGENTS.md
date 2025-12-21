@@ -54,7 +54,7 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 
 ## B. DRY & Single Source of Truth
 
-- **One place for logic:** Do not duplicate comment style definitions. They belong in `config.py`.
+- **One place for logic:** Do not duplicate comment style definitions OR extension groupings (e.g., `PYTHON_EXTS`). They belong in `config.py`.
 - **One place for file processing:** `core.py:process_file` is the only function that touches the filesystem for reading/writing.
 
 ---
@@ -124,7 +124,8 @@ The application uses a Strategy/Factory pattern to support different file types.
 
 ### H.3 Configuration Consistency
 
-- **XML Consistency:** If an extension is added to `config.py` that represents an XML-based format (e.g., `.svg`, `.xaml`), it **MUST** also be added to the `XML_EXTS` set in `src/context_headers/languages/factory.py` to ensure XML declarations are respected.
+- **XML Consistency:** If an extension is added to `config.py` that represents an XML-based format (e.g., `.svg`, `.xaml`), it **MUST** also be added to the `DECLARATION_EXTS` set in `config.py` to ensure XML declarations are respected.
+- **Grouping Consistency:** All extension groupings (e.g. `PYTHON_EXTS`, `FRONTMATTER_EXTS`) MUST be defined in `config.py` and imported by `factory.py`. Do not define lists of extensions inside `factory.py`.
 - **Cleanup:** Do not leave empty or "ghost" keys in `config.py`. If a file type is not supported, remove it.
 
 ---

@@ -8,7 +8,13 @@ Maps file extensions and names to specific HeaderStrategy implementations.
 from __future__ import annotations
 from pathlib import Path
 
-from ..config import COMMENT_STYLES
+from ..config import (
+    COMMENT_STYLES,
+    PYTHON_EXTS,
+    PHP_EXTS,
+    FRONTMATTER_EXTS,
+    DECLARATION_EXTS,
+)
 from .base import HeaderStrategy
 from .strategies import (
     PythonStrategy,
@@ -18,42 +24,6 @@ from .strategies import (
     FrontmatterStrategy,
     DockerfileStrategy,
 )
-
-# Extensions that need specific strategies
-PYTHON_EXTS = {".py", ".pyi", ".pyw", ".pyx"}
-PHP_EXTS = {".php", ".phtml", ".php3", ".php4", ".phps"}
-FRONTMATTER_EXTS = {".astro", ".md", ".markdown"}
-
-# Extensions that require skipping Top-of-File declarations.
-# This includes XML, HTML, Web Templates (Razor/ASP), CSS (@charset),
-# and Build Configs (MSBuild/WiX).
-DECLARATION_EXTS = {
-    # Web & Markup
-    ".xml",
-    ".html",
-    ".htm",
-    ".xhtml",
-    ".vue",
-    ".svelte",
-    ".css",
-    ".svg",
-    # Server-Side Templates
-    ".aspx",
-    ".cshtml",
-    ".jsp",
-    ".razor",
-    ".cfm",
-    ".cfc",
-    # Build & Config
-    ".xaml",
-    ".xslt",
-    ".xbl",
-    ".xsp",
-    ".plist",
-    ".wxs",
-    ".csproj",
-    ".vbproj",
-}
 
 
 def get_strategy_for_file(path_obj: Path) -> HeaderStrategy | None:

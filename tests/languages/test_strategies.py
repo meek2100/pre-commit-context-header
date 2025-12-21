@@ -100,6 +100,25 @@ def test_declaration_strategy_skips_doctype() -> None:
     assert strategy.get_insertion_index(lines_lower) == 1
 
 
+def test_declaration_strategy_skips_multiline_unsafe() -> None:
+    """Verifies that DeclarationStrategy skips or handles multi-line declarations."""
+    strategy = DeclarationStrategy("")
+
+    # Multi-line Doctype (Found within limit)
+    lines_multi = [
+        "<!DOCTYPE html\n",
+        "  PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN'\n",
+        "  'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>\n",
+        "<html>\n",
+    ]
+    # Should insert after line 2 (index 3)
+    assert strategy.get_insertion_index(lines_multi) == 3
+
+    # Unclosed/Too long (Safety Skip)
+    lines_forever = ["<!DOCTYPE html\n"] * 30
+    assert strategy.get_insertion_index(lines_forever) == -1
+
+
 def test_declaration_strategy_skips_web_directives() -> None:
     """Verifies that DeclarationStrategy skips CSS @charset and Razor @page."""
     strategy = DeclarationStrategy("")
