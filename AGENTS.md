@@ -27,6 +27,7 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 - Do NOT remove the `MAX_FILE_SIZE_BYTES` safety check.
 - Do NOT modify the `HeaderStrategy` inheritance structure without explicit instruction.
 - Do NOT skip strict encoding checks (UTF-8 is the standard).
+- Do NOT corrupt files containing Byte Order Marks (BOM). These files must be skipped.
 - Do NOT introduce "interactive" modes (Pre-commit hooks must run non-interactively).
 
 ### Markdown Formatting Rule (CRITICAL)
@@ -150,6 +151,7 @@ The application uses a Strategy/Factory pattern to support different file types.
 - **CSS Charset Preservation:** The tool must **never** insert a header before `@charset "..."` or similar.
 - **Razor Page Preservation:** The tool must **never** insert a header before `@page ...` in Razor/Blazor files.
 - **Dockerfile Directive Preservation:** The tool must **never** insert a header before Dockerfile parser directives (`# syntax=`, `# escape=`, `# check=`).
+- **BOM Preservation:** The tool must **never** modify files starting with a Byte Order Mark (`\ufeff`) to avoid data corruption.
 
 ---
 

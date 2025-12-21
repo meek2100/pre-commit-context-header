@@ -136,6 +136,20 @@ def test_declaration_strategy_skips_web_directives() -> None:
     assert strategy.get_insertion_index(lines_asp) == 1
 
 
+def test_declaration_strategy_multiline_css() -> None:
+    """Verifies that DeclarationStrategy handles multi-line CSS charsets."""
+    strategy = DeclarationStrategy("")
+
+    # Case 1: Semicolon on line 2 (index 1) - Covers lines 164-166
+    lines_split = ['@charset "UTF-8"\n', ";\n", "body {}\n"]
+    # Should insert after line 2 (index 2)
+    assert strategy.get_insertion_index(lines_split) == 2
+
+    # Case 2: Semicolon missing in first 5 lines (Safety Skip) - Covers line 167
+    lines_missing = ['@charset "UTF-8"\n', "body {}\n"]
+    assert strategy.get_insertion_index(lines_missing) == -1
+
+
 def test_php_strategy_skips_opentag() -> None:
     """Verifies that PhpStrategy skips opening PHP tags to insert headers inside the block."""
     strategy = PhpStrategy("// File: {}")

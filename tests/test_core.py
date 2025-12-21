@@ -68,6 +68,28 @@ def test_process_file_binary_skipped(tmp_path: Path) -> None:
     assert f.read_bytes() == b"\x80\x81\x82"
 
 
+def test_process_file_bom_skipped(tmp_path: Path) -> None:
+    """Verifies that files with a Byte Order Mark (BOM) are skipped to prevent corruption."""
+    f = tmp_path / "bom.py"
+    # Write BOM + Content
+    f.write_text("\ufeffprint('hi')\n", encoding="utf-8")
+
+    # Should return False (skipped)
+    assert not process_file(str(f), fix_mode=True)
+    # File should remain unchanged (BOM preserved, no header added)
+    assert f.read_text(encoding="utf-8") == "\ufeffprint('hi')\n"
+
+
+def test_process_file_unsupported_extension_skipped(tmp_path: Path) -> None:
+    """Verifies that files with unsupported extensions are quietly skipped."""
+    f = tmp_path / "test.unknown"
+    f.write_text("content", encoding="utf-8")
+
+    # Should return False because get_strategy_for_file returns None
+    assert not process_file(str(f), fix_mode=True)
+    assert f.read_text(encoding="utf-8") == "content"
+
+
 def test_process_file_stat_oserror(tmp_path: Path) -> None:
     """Verifies that OSErrors during stat checks are handled gracefully."""
     f = tmp_path / "stat_error.py"
@@ -173,3 +195,24 @@ def test_process_file_skips_mandatory_exclusions(tmp_path: Path) -> None:
 
     # Content should remain untouched
     assert f.read_text(encoding="utf-8") == '[package]\nname = "foo"\n'
+
+
+def test_process_file_remove_mode_success(tmp_path: Path) -> None:
+    """Verifies that remove_mode=True successfully removes an existing header."""
+    f = tmp_path / "remove.py"
+    # Create file with a header
+    f.write_text("# File: some/path.py\nprint('hello')\n", encoding="utf-8")
+
+    assert process_file(str(f), fix_mode=False, remove_mode=True)
+
+    # Header should be gone
+    assert f.read_text(encoding="utf-8") == "print('hello')\n"
+
+
+def test_process_file_remove_mode_no_header(tmp_path: Path) -> None:
+    """Verifies that remove_mode=True does nothing if no header exists."""
+    f = tmp_path / "clean.py"
+    f.write_text("print('hello')\n", encoding="utf-8")
+
+    assert not process_file(str(f), fix_mode=False, remove_mode=True)
+    assert f.read_text(encoding="utf-8") == "print('hello')\n"
