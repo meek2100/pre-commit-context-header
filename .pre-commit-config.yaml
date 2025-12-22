@@ -1,28 +1,34 @@
 # File: .pre-commit-config.yaml
-# Optimized for: pre-commit-context-header
+# Optimized for: Speed > Fixers > Linters > Type Checkers
+
 repos:
+  # 1. Standard Cleanup & Safety (Fastest)
+  # Run these first to canonicalize files (trim whitespace, fix endings) and catch bad files (large, private keys)
+  # before other tools waste time processing them.
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: detect-private-key
+      - id: no-commit-to-branch
+        args: [--branch, main]
+
+  # 2. Project Specific Fixers (Fast)
+  # Apply headers now that the file is clean.
   - repo: https://github.com/meek2100/pre-commit-context-header
     rev: v0.1.0
     hooks:
       - id: context-headers
         args: [--fix]
 
-  # 1. Standard Cleanup and Security
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
-    hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
-      - id: check-added-large-files
-        args: ["--maxkb=500"]
-      - id: mixed-line-ending
-        args: ["--fix=lf"]
-      - id: detect-private-key
-      - id: no-commit-to-branch
-        args: [--branch, main]
-
-  # 2. Python (Ruff) - Faster linting and formatting
+  # 3. Linting & Formatting (Fast)
+  # Ruff cleans up code style and catches syntax errors immediately.
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.10
     hooks:
@@ -30,12 +36,24 @@ repos:
         args: ["--fix"]
       - id: ruff-format
 
-  # 3. Type Checking (MyPy)
+  # 4. Type Checking (Slowest)
+  # Run these last. If the code is broken or malformed, the previous steps will catch it first.
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: "v1.19.1"
     hooks:
       - id: mypy
         args: ["--no-incremental"]
+        additional_dependencies:
+          - pytest
+          - click
+          - pyyaml
+          - types-PyYAML
+
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.407
+    hooks:
+      - id: pyright
+        # Mirroring dependencies to ensure Pyright can resolve imports
         additional_dependencies:
           - pytest
           - click
