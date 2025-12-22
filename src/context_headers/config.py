@@ -32,6 +32,7 @@ ALWAYS_SKIP_FILENAMES: set[str] = {
     "uv.lock",
     "Cargo.lock",
     "go.sum",
+    "go.mod",  # Safety: Prevent confusion with Modula-2 (.mod) strategy
     "Gemfile.lock",
     "composer.lock",
     "mix.lock",

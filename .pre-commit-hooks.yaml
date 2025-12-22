@@ -18,6 +18,7 @@
         uv\.lock|
         Cargo\.lock|
         go\.sum|
+        go\.mod|
         Gemfile\.lock|
         composer\.lock|
         mix\.lock|
