@@ -73,6 +73,7 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 ## D. Python Standards
 
 - **Strict Typing:** `from __future__ import annotations` must be present in every file.
+- **Public API Exports:** All modules (especially `cli.py` and `core.py`) must define `__all__` to explicitly declare their public interface and satisfy strict type checkers.
 - **Pathlib:** Use `pathlib.Path` for all file interactions. Do not use `os.path`.
 - **Imports:** Absolute imports are preferred over relative imports for clarity, except within the package where relative imports (e.g., `from .core import process_file`) are acceptable for module encapsulation.
 
@@ -83,6 +84,7 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 - **Coverage:** strict 100% coverage (`--cov-fail-under=100`).
 - **Prohibited Pragmas:** You must NOT use `# pragma: no cover` to silence coverage errors on logic that is reachable. Logic such as bounds clamping or edge case handling must be tested via specific test cases, not ignored.
 - **Idempotency Tests:** Every test case that checks for header insertion **MUST** also verify that running the tool a second time produces no changes.
+- **Configuration Sync:** Tests must ensure that external configurations (like `.pre-commit-hooks.yaml`) stay in sync with Python constants (like `config.py`).
 - **Fixture Usage:** Use `tmp_path` fixture for all filesystem tests. Do not create files in the actual source tree during testing.
 - **Mocking:** Mock `sys.argv` for CLI tests. Mock `pathlib.Path.stat` for size limit tests.
 

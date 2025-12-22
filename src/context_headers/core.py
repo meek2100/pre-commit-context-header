@@ -12,6 +12,8 @@ from pathlib import Path
 from .config import MAX_FILE_SIZE_BYTES, ALWAYS_SKIP_FILENAMES
 from .languages.factory import get_strategy_for_file
 
+__all__ = ["process_file"]
+
 
 def process_file(filepath: str, fix_mode: bool, remove_mode: bool = False) -> bool:
     """Processes a single file to enforce or remove context headers.

@@ -225,6 +225,7 @@ class FrontmatterStrategy(HeaderStrategy):
 
         Returns:
             The line index after the closing '---' of the frontmatter, or 0.
+            Returns -1 if the frontmatter block is unclosed (safety skip).
         """
         if not lines:
             return 0
@@ -235,5 +236,8 @@ class FrontmatterStrategy(HeaderStrategy):
             for i in range(1, len(lines)):
                 if lines[i].strip() == "---":
                     return i + 1
+
+            # Safety: Unclosed frontmatter block. Do not insert header.
+            return -1
 
         return 0
