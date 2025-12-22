@@ -47,7 +47,7 @@ The tool supports context headers for **200+ file extensions**.
 - **C/C++/Obj-C:** `.c`, `.cpp`, `.h`, `.hpp`, `.cc`, `.cxx`, `.m`, `.mm`
 - **Java/JVM:** `.java`, `.kt` (Kotlin), `.scala`, `.groovy`
 - **Modern:** `.go`, `.rs` (Rust), `.swift`, `.dart`, `.zig`, `.nim`, `.v`, `.jl` (Julia)
-- **Microsoft:** `.cs` (C#), `.fs` (F#), `.bat`, `.cmd`, `.ps1` (PowerShell)
+- **Microsoft / .NET:** `.cs` (C#), `.fs` (F#), `.bat`, `.cmd`, `.ps1` (PowerShell), `.xaml`, `.csproj`, `.vbproj`
 
 ### 🎨 Web & Frontend
 
@@ -61,7 +61,7 @@ The tool supports context headers for **200+ file extensions**.
 ### 🧱 Config, Data, & Infrastructure
 
 - **Config:** `.yaml`, `.yml`, `.toml`, `.ini`, `.conf`, `.cfg`, `.properties`
-- **Infrastructure:** `.tf` (Terraform), `.hcl`, `.dockerfile`, `.nix`, `.bicep`
+- **Infrastructure:** `.tf` (Terraform), `.hcl`, `.dockerfile`, `.nix`, `.bicep`, `.wxs` (WiX)
 - **Data:** `.sql`, `.graphql`, `.proto` (Protobuf), `.json5`, `.hjson` (Note: Standard `.json` is excluded)
 - **Documentation:** `.md`, `.rst`, `.tex`, `.adoc`
 

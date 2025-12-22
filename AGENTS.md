@@ -50,6 +50,8 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 - `PythonStrategy`, `XmlStrategy`, etc., handle specific insertion logic (skipping shebangs/declarations).
 - **Configuration:**
 - `src/context_headers/config.py` is the Single Source of Truth for constants (e.g., `COMMENT_STYLES`).
+- **Configuration Synchronization:**
+- The `exclude` list in `.pre-commit-hooks.yaml` **MUST** explicitly duplicate the `ALWAYS_SKIP_FILENAMES` from `config.py`. This ensures that `pre-commit` skips these files entirely before spinning up the Python process, optimizing performance.
 
 ---
 

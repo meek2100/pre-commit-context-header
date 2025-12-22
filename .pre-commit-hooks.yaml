@@ -6,11 +6,25 @@
   language: python
   types: [text]
   # Files to exclude by default from all projects using this hook
+  # Note: This list explicitly duplicates config.py ALWAYS_SKIP_FILENAMES for performance.
+  # We want pre-commit to filter these BEFORE spinning up the Python process.
   exclude: |
     (?x)^(
         package-lock\.json|
-        poetry\.lock|
         yarn\.lock|
+        pnpm-lock\.yaml|
+        npm-shrinkwrap\.json|
+        poetry\.lock|
+        uv\.lock|
+        Cargo\.lock|
+        go\.sum|
+        Gemfile\.lock|
+        composer\.lock|
+        mix\.lock|
+        pubspec\.lock|
+        Pipfile\.lock|
+        bun\.lockb|
+        deno\.lock|
         .*\.min\.js|
         .*\.min\.css|
         .*\.svg|
