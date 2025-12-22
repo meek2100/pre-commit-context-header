@@ -96,3 +96,16 @@ def test_main_execution() -> None:
         with pytest.raises(SystemExit) as e:
             runpy.run_module("context_headers", run_name="__main__")
         assert e.value.code == 0
+
+
+def test_cli_sys_argv_fallback() -> None:
+    """Verifies that run() uses sys.argv if no arguments are provided.
+
+    This ensures the default argument `argv=None` in run() is covered.
+    """
+    # Simulate command line arguments: ['prog_name', '--help']
+    # run() (without args) will call parser.parse_args(None), which defaults to sys.argv[1:]
+    with patch("sys.argv", ["context-headers", "--help"]):
+        with pytest.raises(SystemExit) as e:
+            run()
+        assert e.value.code == 0

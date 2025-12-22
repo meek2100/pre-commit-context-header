@@ -20,6 +20,12 @@ classifiers = [
     "Topic :: Software Development :: Quality Assurance",
 ]
 
+[project.urls]
+Homepage = "https://github.com/meek2100/pre-commit-context-header"
+Repository = "https://github.com/meek2100/pre-commit-context-header"
+Issues = "https://github.com/meek2100/pre-commit-context-header/issues"
+Changelog = "https://github.com/meek2100/pre-commit-context-header/releases"
+
 [project.optional-dependencies]
 dev = [
     "pytest==9.0.2",
@@ -28,6 +34,7 @@ dev = [
     "pre-commit==4.5.1",
     "mypy==1.19.1",
     "types-setuptools>=80.9.0",
+    "types-PyYAML>=6.0.12",
 ]
 
 [project.scripts]
@@ -36,6 +43,9 @@ context-headers = "context_headers.cli:main"
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+context_headers = ["py.typed"]
 
 [tool.mypy]
 strict = true

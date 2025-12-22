@@ -11,6 +11,8 @@ import sys
 
 from .core import process_file
 
+__all__ = ["run", "main"]
+
 
 def run(argv: list[str] | None = None) -> int:
     """Executes the CLI application.

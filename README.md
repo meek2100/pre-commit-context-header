@@ -1,9 +1,6 @@
 <!-- File: README.md -->
-
 # pre-commit-context-header
 
-![PyPI - Version](https://img.shields.io/pypi/v/pre-commit-context-header)
-![Python Versions](https://img.shields.io/pypi/pyversions/pre-commit-context-header)
 ![License](https://img.shields.io/github/license/meek2100/pre-commit-context-header)
 [![CI Status](https://github.com/meek2100/pre-commit-context-header/actions/workflows/ci.yaml/badge.svg)](https://github.com/meek2100/pre-commit-context-header/actions/workflows/ci.yaml)
 
@@ -26,6 +23,14 @@ repos:
         args: [--fix] # Optional: Remove this line if you only want to check, not auto-fix
 ```
 
+### CLI Options
+
+You can also run the tool manually (after `pip install pre-commit-context-header`):
+
+- **`--fix`**: Automatically adds or updates missing headers.
+- **`--remove`**: **Removes** context headers from all targeted files. Useful if you decide to uninstall the tool or need to "reset" files.
+- _Example:_ `context-headers --remove src/**/*.py`
+
 ## Supported File Types
 
 The tool supports context headers for **200+ file extensions**.
@@ -42,7 +47,7 @@ The tool supports context headers for **200+ file extensions**.
 - **C/C++/Obj-C:** `.c`, `.cpp`, `.h`, `.hpp`, `.cc`, `.cxx`, `.m`, `.mm`
 - **Java/JVM:** `.java`, `.kt` (Kotlin), `.scala`, `.groovy`
 - **Modern:** `.go`, `.rs` (Rust), `.swift`, `.dart`, `.zig`, `.nim`, `.v`, `.jl` (Julia)
-- **Microsoft:** `.cs` (C#), `.fs` (F#), `.bat`, `.cmd`, `.ps1` (PowerShell)
+- **Microsoft / .NET:** `.cs` (C#), `.fs` (F#), `.bat`, `.cmd`, `.ps1` (PowerShell), `.xaml`, `.csproj`, `.vbproj`
 
 ### 🎨 Web & Frontend
 
@@ -56,7 +61,7 @@ The tool supports context headers for **200+ file extensions**.
 ### 🧱 Config, Data, & Infrastructure
 
 - **Config:** `.yaml`, `.yml`, `.toml`, `.ini`, `.conf`, `.cfg`, `.properties`
-- **Infrastructure:** `.tf` (Terraform), `.hcl`, `.dockerfile`, `.nix`, `.bicep`
+- **Infrastructure:** `.tf` (Terraform), `.hcl`, `.dockerfile`, `.nix`, `.bicep`, `.wxs` (WiX)
 - **Data:** `.sql`, `.graphql`, `.proto` (Protobuf), `.json5`, `.hjson` (Note: Standard `.json` is excluded)
 - **Documentation:** `.md`, `.rst`, `.tex`, `.adoc`
 

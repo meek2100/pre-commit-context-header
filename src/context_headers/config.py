@@ -29,13 +29,18 @@ ALWAYS_SKIP_FILENAMES: set[str] = {
     "pnpm-lock.yaml",
     "npm-shrinkwrap.json",
     "poetry.lock",
+    "uv.lock",
     "Cargo.lock",
     "go.sum",
+    "go.mod",  # Safety: Prevent confusion with Modula-2 (.mod) strategy
     "Gemfile.lock",
     "composer.lock",
     "mix.lock",
     "pubspec.lock",
     "Pipfile.lock",
+    "bun.lockb",  # Binary lockfile (Critical safety)
+    "deno.lock",
+    ".terraform.lock.hcl",  # Critical: Terraform state lock
 }
 
 # --- Extension Groupings (Single Source of Truth) ---
@@ -58,6 +63,7 @@ DECLARATION_EXTS: set[str] = {
     ".css",
     ".svg",
     # Server-Side Templates
+    ".asp",  # Safety: Classic ASP directive handling
     ".aspx",
     ".cshtml",
     ".jsp",
@@ -209,6 +215,8 @@ COMMENT_STYLES: dict[str, str] = {
     ".purs": "-- File: {}",
     ".r": "# File: {}",
     ".R": "# File: {}",
+    ".Rprofile": "# File: {}",
+    ".Renviron": "# File: {}",
     ".scm": "; File: {}",
     ".ss": "; File: {}",
     ".lisp": "; File: {}",

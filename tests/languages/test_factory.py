@@ -6,6 +6,7 @@ Verifies that the correct strategy class is instantiated for different
 file extensions and naming conventions (e.g., Dockerfiles, Dotfiles).
 """
 
+from __future__ import annotations
 from pathlib import Path
 from context_headers.config import COMMENT_STYLES
 from context_headers.languages.base import HeaderStrategy
@@ -21,18 +22,29 @@ from context_headers.languages.strategies import (
 
 
 def test_factory_supports_all_config_extensions() -> None:
-    """Verifies that EVERY extension in config.py yields a valid strategy."""
-    for ext in COMMENT_STYLES:
-        # Create a dummy path like "test.py", "test.dockerfile", etc.
-        if ext.startswith("."):
-            path = Path(f"test{ext}")
-        else:
-            # Handle unusual keys if any (currently none, but good for future)
-            path = Path(ext)
+    """Verifies that EVERY extension in config.py yields a valid strategy.
 
-        strategy = get_strategy_for_file(path)
+    This test iterates over the Single Source of Truth (COMMENT_STYLES)
+    and ensures that the factory can resolve every key defined there.
+    It handles both standard extensions (which are case-insensitive in the factory)
+    and dotfiles (which are case-sensitive if they have no prefix).
+    """
+    for ext in COMMENT_STYLES:
+        # 1. Attempt as a standard extension (e.g., test.py, test.R)
+        # The factory logic lowercases extensions, so 'test.R' becomes '.r'.
+        # If '.r' exists in config, this passes.
+        path_as_extension = Path(f"test{ext}") if ext.startswith(".") else Path(ext)
+        strategy = get_strategy_for_file(path_as_extension)
+
+        # 2. If that failed, attempt as a standalone filename (e.g., .Rprofile)
+        # The factory logic preserves case for dotfiles with no extension prefix.
+        if strategy is None:
+            path_as_filename = Path(ext)
+            strategy = get_strategy_for_file(path_as_filename)
+
         assert strategy is not None, (
-            f"Extension '{ext}' defined in config but factory returned None"
+            f"Extension/File '{ext}' defined in config but factory returned None "
+            f"for both '{path_as_extension}' and '{ext}'."
         )
         assert isinstance(strategy, HeaderStrategy)
 
@@ -128,6 +140,15 @@ def test_factory_selects_correct_strategy() -> None:
     # Dotfiles (Explicitly in config or via name)
     assert isinstance(get_strategy_for_file(Path(".bashrc")), ShebangStrategy)
     assert isinstance(get_strategy_for_file(Path(".gitignore")), ShebangStrategy)
+    # Check case-sensitive dotfile support explicitly
+    assert isinstance(get_strategy_for_file(Path(".Rprofile")), ShebangStrategy)
+
+
+def test_factory_supports_containerfile() -> None:
+    """Verifies that Containerfile is treated as a Dockerfile."""
+    path = Path("Containerfile")
+    strategy = get_strategy_for_file(path)
+    assert isinstance(strategy, DockerfileStrategy)
 
 
 def test_factory_returns_none_for_unsupported() -> None:
