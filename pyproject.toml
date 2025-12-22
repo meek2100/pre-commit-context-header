@@ -33,6 +33,7 @@ dev = [
     "ruff==0.14.10",
     "pre-commit==4.5.1",
     "mypy==1.19.1",
+    "pyright>=1.1.407",
     "types-setuptools>=80.9.0",
     "types-PyYAML>=6.0.12",
 ]
@@ -58,6 +59,15 @@ exclude = ["build/"]
 module = ["pytest", "_pytest.*"]
 ignore_missing_imports = true
 follow_imports = "skip"
+
+[tool.pyright]
+typeCheckingMode = "strict"
+pythonVersion = "3.10"
+include = ["src", "tests"]
+exclude = ["**/node_modules", "**/__pycache__", "build", "dist"]
+# Ensure we strictly check imports; requires dependencies in env
+reportMissingImports = true
+reportMissingTypeStubs = false
 
 [tool.pytest.ini_options]
 addopts = "--cov=context_headers --cov-report=term-missing --cov-fail-under=100"
