@@ -1,4 +1,5 @@
 <!-- File: README.md -->
+
 # pre-commit-context-header
 
 ![License](https://img.shields.io/github/license/meek2100/pre-commit-context-header)

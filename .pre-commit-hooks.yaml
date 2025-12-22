@@ -26,6 +26,7 @@
         Pipfile\.lock|
         bun\.lockb|
         deno\.lock|
+        .*\.terraform\.lock\.hcl|
         .*\.min\.js|
         .*\.min\.css|
         .*\.svg|

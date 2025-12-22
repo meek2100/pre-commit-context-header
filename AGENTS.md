@@ -138,7 +138,7 @@ The application uses a Strategy/Factory pattern to support different file types.
 ### Performance & Safety
 
 - **Size Limits:** The `MAX_FILE_SIZE_BYTES` (1MB) check is mandatory. Pre-commit hooks run locally on developer machines; we cannot hang on large generated files.
-- **Internal Lockfile Exclusion:** The tool must have an internal "Blocklist" (in `config.py`) for file names that often overlap with supported extensions but should never be modified (e.g., `Cargo.lock`, `package-lock.json`). This ensures safety even if the user's pre-commit config `exclude` regex is loose.
+- **Internal Lockfile Exclusion:** The tool must have an internal "Blocklist" (in `config.py`) for file names that often overlap with supported extensions but should never be modified (e.g., `Cargo.lock`, `package-lock.json`, `.terraform.lock.hcl`). This ensures safety even if the user's pre-commit config `exclude` regex is loose.
 - **Exit Codes:**
 - `0`: Success (No changes needed).
 - `1`: Failure (Changes made OR error occurred). This is required for pre-commit to stop the commit.
