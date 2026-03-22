@@ -99,24 +99,65 @@ def process_file(filepath: str, fix_mode: bool, remove_mode: bool = False) -> bo
         stripped = line.strip()
         if not stripped:
             continue
-        # If it's a known comment/directive prefix or header line, consider it part of preamble
-        if strategy.is_header_line(line) or any(stripped.startswith(prefix) for prefix in ("#", "//", "/*", "*", "\n# Body\n",
-        encoding="utf-8",
-    )
 
-    # For removal to actually happen in core API, fix_mode must be True
-    assert process_file(str(f), fix_mode=True, remove_mode=True)
+        # 7. Calculate preamble range to prevent stripping header-shaped comments inside code body
+        if (
+            strategy.is_header_line(line)
+            or stripped == "---"
+            or any(
+                stripped.startswith(p)
+                for p in ("#", "//", "/", "'''", '"""', "REM", "/*")
+            )
+        ):
+            continue
 
-    content = f.read_text()
-    assert "\n---\ntitle: test\n---\nbody\n", encoding="utf-8"
-    )
-    assert process_file(str(md), fix_mode=True)
-    assert "---\ntitle: test\n---\n\n\n", encoding="utf-8")
-    assert process_file(str(only_h), fix_mode=True)  # Deduplicates to one
+        # Stop at the first non-header, non-comment line
+        preamble_end = i
+        break
 
-    # 7. Unclosed CSS
-    css = tmp_path / "unsafe.css"
-    css_content = "@charset 'UTF-8'\nbody {}\n"
-    css.write_text(css_content, encoding="utf-8")  # No semicolon
-    assert not process_file(str(css), fix_mode=True)
-    assert css.read_text(encoding="utf-8") == css_content
+    # 8. Collect all redundant headers for removal (Constrained to preamble)
+    for i in range(preamble_end):
+        if strategy.is_header_line(lines[i]) and i != primary_header_idx:
+            redundant_idxs.append(i)
+
+    # 9. Modification Check
+    expected_header = strategy.get_expected_header(path_obj)
+    needs_insertion = False
+    needs_removal = bool(redundant_idxs)
+
+    if remove_mode:
+        if primary_header_idx != -1:
+            redundant_idxs.append(primary_header_idx)
+            needs_removal = True
+    else:
+        # We need a header. Is the primary one correct?
+        if primary_header_idx == -1 or lines[primary_header_idx] != expected_header:
+            needs_insertion = True
+            if primary_header_idx != -1:
+                redundant_idxs.append(primary_header_idx)
+                needs_removal = True
+
+    if not (needs_insertion or needs_removal):
+        return False
+
+    # 10. Apply Fixes or Report
+    if not fix_mode:
+        msg = (
+            "Missing or incorrect header"
+            if not remove_mode
+            else "Extraneous header found"
+        )
+        print(f"{msg}: {filepath}")
+        return True
+
+    # Apply removals in reverse order to keep indices valid
+    for idx in sorted(set(redundant_idxs), reverse=True):
+        lines.pop(idx)
+        # If we remove a line BEFORE the insertion point, the insertion point moves up.
+        if not remove_mode and idx < insert_idx:
+            insert_idx -= 1
+
+    if needs_insertion and not remove_mode:
+        lines.insert(insert_idx, expected_header)
+
+    return _write_back(path_obj, "".join(lines), filepath)

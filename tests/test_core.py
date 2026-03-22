@@ -116,6 +116,18 @@ def test_process_file_read_oserror(tmp_path: Path) -> None:
         assert not process_file(str(f), fix_mode=True)
 
 
+def test_process_file_write_error(tmp_path: Path) -> None:
+    """Verifies that OSErrors during file writing are handled gracefully."""
+    f = tmp_path / "write_error.py"
+    f.write_text("print('hi')\n", encoding="utf-8")
+
+    # Mock write_text to raise PermissionError
+    with patch(
+        "pathlib.Path.write_text", side_effect=PermissionError("Permission denied")
+    ):
+        assert not process_file(str(f), fix_mode=True)
+
+
 def test_process_file_adds_newline_if_missing(tmp_path: Path) -> None:
     """Verifies that a newline is appended to the last line if missing."""
     f = tmp_path / "no_newline.py"
@@ -268,13 +280,16 @@ def test_remove_mode_skips_whitespace(tmp_path: Path) -> None:
 def test_process_file_deduplication(tmp_path: Path) -> None:
     """Verifies that multiple headers are deduplicated to a single correct one."""
     f = tmp_path / "dedup.py"
-    # File with multiple headers - one correct at index 2, others misplaced
+    # 1. Correct header at index 2, but misplaced headers at 0 and 3 (all in preamble)
     correct_header = f"# File: {f.as_posix()}\n"
     content = (
-        "# File: wrong.py\n"  # Misplaced (before shebang)
+        "# File: wrong.py\n"  # Misplaced 1
         "#!/usr/bin/env python\n"
-        "\n" + correct_header + "print('hi')\n"
-        "# File: extra.py\n"  # Duplicate
+        "# File: extra.py\n"  # Misplaced 2 (Duplicate)
+        "\n"  # Empty line (Still preamble)
+        "print('hi')\n"  # FIRST CODE LINE
+        "# Case: This header should BE PROTECTED because it is after code\n"
+        "# File: protected.py\n"
     )
     f.write_text(content, encoding="utf-8")
 
@@ -282,18 +297,17 @@ def test_process_file_deduplication(tmp_path: Path) -> None:
     assert process_file(str(f), fix_mode=True)
 
     final_content = f.read_text()
-    assert final_content.count("# File:") == 1
-    lines = final_content.splitlines(keepends=True)
-    assert lines[0] == "#!/usr/bin/env python\n"
-    assert lines[1] == "\n"
-    assert lines[2] == correct_header
+    # We expect count to be 2: One correct at the top, one protected in the body
+    assert final_content.count("# File:") == 2
+    assert final_content.startswith(f"#!/usr/bin/env python\n{correct_header}")
+    assert "# File: protected.py" in final_content
 
 
 def test_process_file_dedup_on_addition(tmp_path: Path) -> None:
     """Verifies reporting when adding a header AND removing duplicates (hits line 167)."""
     f = tmp_path / "add_dedup.py"
     # File with no header at ideal spot, but a duplicate elsewhere
-    content = "#!/usr/bin/env python\nprint('hi')\n# File: extra.py\n"
+    content = "#!/usr/bin/env python\n# File: extra.py\nprint('hi')\n"
     f.write_text(content, encoding="utf-8")
     assert process_file(str(f), fix_mode=True)
     assert f.read_text().count("# File:") == 1
