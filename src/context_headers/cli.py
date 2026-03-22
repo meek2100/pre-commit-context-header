@@ -36,8 +36,14 @@ def run(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     files_impacted = 0
-    for f in args.filenames:
-        if process_file(f, fix_mode=args.fix, remove_mode=args.remove):
+    for path in args.filenames:
+        # If remove mode is on, we treat it as an action (implies fix)
+        # unless we want to support a dry-run remove in the future.
+        # For now, we maintain original behavior where --remove is an action.
+        modified = process_file(
+            str(path), fix_mode=args.fix or args.remove, remove_mode=args.remove
+        )
+        if modified:
             files_impacted += 1
 
     if files_impacted > 0:

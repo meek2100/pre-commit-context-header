@@ -7,12 +7,23 @@ strategy selection, and content modification.
 """
 
 from __future__ import annotations
+import sys
 from pathlib import Path
 
 from .config import MAX_FILE_SIZE_BYTES, ALWAYS_SKIP_FILENAMES
 from .languages.factory import get_strategy_for_file
 
 __all__ = ["process_file"]
+
+
+def _write_back(path_obj: Path, content: str, filepath: str) -> bool:
+    """Helper to safely write back file content, handling permission errors."""
+    try:
+        path_obj.write_text(content, encoding="utf-8")
+        return True
+    except (OSError, PermissionError) as exc:
+        print(f"Skipping {filepath}: {exc}", file=sys.stderr)
+        return False
 
 
 def process_file(filepath: str, fix_mode: bool, remove_mode: bool = False) -> bool:
@@ -33,15 +44,12 @@ def process_file(filepath: str, fix_mode: bool, remove_mode: bool = False) -> bo
     path_obj = Path(filepath)
 
     # 1. Mandatory Exclusion Check
-    # Safety: Skip known lockfiles and other forbidden files immediately.
-    # This takes precedence over size or extension checks.
     if path_obj.name in ALWAYS_SKIP_FILENAMES:
         return False
 
     # 2. Size Check
     try:
         if path_obj.stat().st_size > MAX_FILE_SIZE_BYTES:
-            # Silently skip large files
             return False
     except (OSError, PermissionError):
         return False
@@ -54,9 +62,6 @@ def process_file(filepath: str, fix_mode: bool, remove_mode: bool = False) -> bo
     # 4. Read Content
     try:
         text_content = path_obj.read_text(encoding="utf-8")
-
-        # Safety: Check for Byte Order Mark (BOM).
-        # If present, prepending data corrupts the file. We must skip.
         if text_content.startswith("\ufeff"):
             return False
 
@@ -67,58 +72,92 @@ def process_file(filepath: str, fix_mode: bool, remove_mode: bool = False) -> bo
     # 5. Determine Insertion Point via Strategy
     insert_idx = strategy.get_insertion_index(lines)
 
-    # Safety: Strategy requested skip (e.g., ambiguous PHP/HTML)
     if insert_idx == -1:
         return False
 
-    # Safety: Append newline to last line if missing to prevent concatenation issues
     if lines and not lines[-1].endswith("\n"):
         lines[-1] += "\n"
 
-    # Clamp index
     if insert_idx > len(lines):
         insert_idx = len(lines)
 
-    # 6. Check for Existing Header
-    current_header_exists = False
-    if len(lines) > insert_idx:
-        current_line = lines[insert_idx]
-        if strategy.is_header_line(current_line):
-            current_header_exists = True
+    # 6. Primary Header Selection & Deduplication
+    primary_header_idx = -1
+    check_idx = insert_idx
+    while check_idx < len(lines) and not lines[check_idx].strip():
+        check_idx += 1
 
-    # 7. Remove Mode Logic
-    if remove_mode:
-        if current_header_exists:
-            lines.pop(insert_idx)
-            path_obj.write_text("".join(lines), encoding="utf-8")
-            print(f"Removed header: {filepath}")
-            return True
-        return False
+    if check_idx < len(lines) and strategy.is_header_line(lines[check_idx]):
+        primary_header_idx = check_idx
 
-    # 8. Check Status (Fix/Check Mode)
+    # 7. Collect all redundant headers for removal (Constrained to preamble)
+    redundant_idxs: list[int] = []
+
+    # Calculate preamble range to prevent stripping header-shaped comments inside code body
+    preamble_end = len(lines)
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if not stripped:
+            continue
+
+        # 7. Calculate preamble range to prevent stripping header-shaped comments inside code body
+        if (
+            strategy.is_header_line(line)
+            or stripped == "---"
+            or any(
+                stripped.startswith(p)
+                for p in ("#", "//", "/", "'''", '"""', "REM", "/*")
+            )
+        ):
+            continue
+
+        # Stop at the first non-header, non-comment line
+        preamble_end = i
+        break
+
+    # 8. Collect all redundant headers for removal (Constrained to preamble)
+    for i in range(preamble_end):
+        if strategy.is_header_line(lines[i]) and i != primary_header_idx:
+            redundant_idxs.append(i)
+
+    # 9. Modification Check
     expected_header = strategy.get_expected_header(path_obj)
-    header_status = "missing"
+    needs_insertion = False
+    needs_removal = bool(redundant_idxs)
 
-    if current_header_exists:
-        if lines[insert_idx].strip() == expected_header.strip():
-            header_status = "correct"
-        else:
-            header_status = "incorrect"
+    if remove_mode:
+        if primary_header_idx != -1:
+            redundant_idxs.append(primary_header_idx)
+            needs_removal = True
+    else:
+        # We need a header. Is the primary one correct?
+        if primary_header_idx == -1 or lines[primary_header_idx] != expected_header:
+            needs_insertion = True
+            if primary_header_idx != -1:
+                redundant_idxs.append(primary_header_idx)
+                needs_removal = True
 
-    if header_status == "correct":
+    if not (needs_insertion or needs_removal):
         return False
 
-    # 9. Action
+    # 10. Apply Fixes or Report
     if not fix_mode:
-        print(f"Missing or incorrect header: {filepath}")
+        msg = (
+            "Missing or incorrect header"
+            if not remove_mode
+            else "Extraneous header found"
+        )
+        print(f"{msg}: {filepath}")
         return True
-    else:
-        if header_status == "incorrect":
-            lines[insert_idx] = expected_header
-            print(f"Updated header: {filepath}")
-        else:
-            lines.insert(insert_idx, expected_header)
-            print(f"Added header: {filepath}")
 
-        path_obj.write_text("".join(lines), encoding="utf-8")
-        return True
+    # Apply removals in reverse order to keep indices valid
+    for idx in sorted(set(redundant_idxs), reverse=True):
+        lines.pop(idx)
+        # If we remove a line BEFORE the insertion point, the insertion point moves up.
+        if not remove_mode and idx < insert_idx:
+            insert_idx -= 1
+
+    if needs_insertion and not remove_mode:
+        lines.insert(insert_idx, expected_header)
+
+    return _write_back(path_obj, "".join(lines), filepath)
