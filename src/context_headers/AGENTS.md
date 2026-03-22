@@ -1,4 +1,3 @@
-<!-- File: src/context_headers/AGENTS.md -->
 # Core Orchestration & CLI Guidance
 
 This directory contains the central logic for the pre-commit hook. AI agents must follow these rules when modifying CLI or orchestration logic.
@@ -41,6 +40,6 @@ This directory contains the central logic for the pre-commit hook. AI agents mus
 
 EVERY source file in this project MUST have a valid context header.
 
-~~~python
-# Path: path/to/file.py
-~~~
+```python
+# File: path/to/file.py
+```

@@ -34,4 +34,4 @@ ENV/
 
 # Logs
 *.log
-*.txt
+logs/*.txt

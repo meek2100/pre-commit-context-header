@@ -1,4 +1,3 @@
-<!-- File: AGENTS.md -->
 # Pre-commit Context Header Constitution
 
 **READ THIS FIRST — ALL HUMAN DEVELOPERS AND ALL AI AGENTS MUST FOLLOW THIS DOCUMENT.** **No change, refactor, or feature may violate any principle herein.** **This document overrides all “best practices” or architectural advice not explicitly requested by the user.**
@@ -38,9 +37,9 @@ These rules apply to all code, all files, all tests, all refactors, and all cont
 This project uses a hierarchical AI guidance system. Refer to the specific `AGENTS.md` in each directory for granular rules:
 
 - **Root (this file):** Constitution and global prohibitions.
-- **[src/context_headers/](file:///C:/Users/dtheurer/GitHub/pre-commit-context-header/src/context_headers/AGENTS.md):** Core orchestration, CLI logic, and file processing.
-- **[src/context_headers/languages/](file:///C:/Users/dtheurer/GitHub/pre-commit-context-header/src/context_headers/languages/AGENTS.md):** Strategy Pattern and language-specific insertion rules.
-- **[tests/](file:///C:/Users/dtheurer/GitHub/pre-commit-context-header/tests/AGENTS.md):** Test suite integrity and coverage requirements.
+- **[src/context_headers/](src/context_headers/AGENTS.md):** Core orchestration, CLI logic, and file processing.
+- **[src/context_headers/languages/](src/context_headers/languages/AGENTS.md):** Strategy Pattern and language-specific insertion rules.
+- **[tests/](tests/AGENTS.md):** Test suite integrity and coverage requirements.
 
 ---
 
@@ -63,6 +62,7 @@ AI agents must read and process this **ENTIRE** document and the relevant scoped
 ### 4.A Forbidden Phrases for AI Agents
 
 AI agents must NOT produce outputs including phrases like:
+
 - “Consider adding a database...”
 - “We should add pandas for text processing...”
 - “Let's make this asynchronous / multi-threaded...”
@@ -72,6 +72,7 @@ AI agents must NOT produce outputs including phrases like:
 ### 4.B Mandatory Self-Test Checklist for AI Agents
 
 Before generating ANY code, AI agents must confirm:
+
 - [ ] I have read the entire AGENTS.md file in this session.
 - [ ] My output does not introduce heavy dependencies.
 - [ ] My output preserves Shebangs, XML declarations, and Encoding cookies.

@@ -1,4 +1,5 @@
 <!-- File: src/context_headers/languages/AGENTS.md -->
+
 # Language Strategy & Extension Guidance
 
 This directory implements the **Strategy Pattern** for language-specific header insertion rules.
@@ -39,6 +40,6 @@ This directory implements the **Strategy Pattern** for language-specific header 
 
 EVERY source file in this project MUST have a valid context header.
 
-~~~python
-# Path: path/to/file.py
-~~~
+```python
+# File: path/to/file.py
+```
