@@ -1,3 +1,4 @@
+<!-- File: src/context_headers/AGENTS.md -->
 # Core Orchestration & CLI Guidance
 
 This directory contains the central logic for the pre-commit hook. AI agents must follow these rules when modifying CLI or orchestration logic.
