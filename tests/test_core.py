@@ -211,7 +211,8 @@ def test_process_file_remove_mode_success(tmp_path: Path) -> None:
     # Create file with a header
     f.write_text("# File: some/path.py\nprint('hello')\n", encoding="utf-8")
 
-    assert process_file(str(f), fix_mode=False, remove_mode=True)
+    # For removal to actually happen in core API, fix_mode must be True
+    assert process_file(str(f), fix_mode=True, remove_mode=True)
 
     # Header should be gone
     assert f.read_text(encoding="utf-8") == "print('hello')\n"
@@ -224,3 +225,234 @@ def test_process_file_remove_mode_no_header(tmp_path: Path) -> None:
 
     assert not process_file(str(f), fix_mode=False, remove_mode=True)
     assert f.read_text(encoding="utf-8") == "print('hello')\n"
+
+
+def test_process_file_with_whitespace_before_header(tmp_path: Path) -> None:
+    """Verifies idempotency when whitespace is added before an existing header."""
+    f = tmp_path / "whitespace.md"
+    f.write_text("---\ntitle: test\n---\n# Body\n", encoding="utf-8")
+
+    # 1. First run adds header
+    process_file(str(f), fix_mode=True)
+    first_pass = f.read_text()
+    assert "<!-- File:" in first_pass
+
+    # 2. Simulate formatter adding a newline before header
+    lines = first_pass.splitlines(keepends=True)
+    # Header is at index 3 in a file with 3 frontmatter lines
+    lines.insert(3, "\n")
+    f.write_text("".join(lines), encoding="utf-8")
+
+    # 3. Second run should NOT add a new header (idempotent)
+    assert not process_file(str(f), fix_mode=True)
+    assert f.read_text().count("<!-- File:") == 1
+
+
+def test_remove_mode_skips_whitespace(tmp_path: Path) -> None:
+    """Verifies that remove_mode skips whitespace to find and remove the header."""
+    f = tmp_path / "remove_ws.md"
+    # Header separated by two newlines
+    f.write_text(
+        "---\ntitle: test\n---\n\n\n<!-- File: remove_ws.md -->\n# Body\n",
+        encoding="utf-8",
+    )
+
+    # For removal to actually happen in core API, fix_mode must be True
+    assert process_file(str(f), fix_mode=True, remove_mode=True)
+
+    content = f.read_text()
+    assert "<!-- File:" not in content
+    assert "# Body" in content
+
+
+def test_process_file_deduplication(tmp_path: Path) -> None:
+    """Verifies that multiple headers are deduplicated to a single correct one."""
+    f = tmp_path / "dedup.py"
+    # File with multiple headers - one correct at index 2, others misplaced
+    correct_header = f"# File: {f.as_posix()}\n"
+    content = (
+        "# File: wrong.py\n"  # Misplaced (before shebang)
+        "#!/usr/bin/env python\n"
+        "\n" + correct_header + "print('hi')\n"
+        "# File: extra.py\n"  # Duplicate
+    )
+    f.write_text(content, encoding="utf-8")
+
+    # Run in fix mode
+    assert process_file(str(f), fix_mode=True)
+
+    final_content = f.read_text()
+    assert final_content.count("# File:") == 1
+    lines = final_content.splitlines(keepends=True)
+    assert lines[0] == "#!/usr/bin/env python\n"
+    assert lines[1] == "\n"
+    assert lines[2] == correct_header
+
+
+def test_process_file_dedup_on_addition(tmp_path: Path) -> None:
+    """Verifies reporting when adding a header AND removing duplicates (hits line 167)."""
+    f = tmp_path / "add_dedup.py"
+    # File with no header at ideal spot, but a duplicate elsewhere
+    content = "#!/usr/bin/env python\nprint('hi')\n# File: extra.py\n"
+    f.write_text(content, encoding="utf-8")
+    assert process_file(str(f), fix_mode=True)
+    assert f.read_text().count("# File:") == 1
+
+
+def test_process_file_no_fix_dedup_only(tmp_path: Path) -> None:
+    """Verifies reporting when only duplicates exist in check mode (hits line 139)."""
+    f = tmp_path / "check_dedup.py"
+    correct_header = f"# File: {f.as_posix()}\n"
+    f.write_text(f"{correct_header}{correct_header}print('hi')\n", encoding="utf-8")
+    assert process_file(str(f), fix_mode=False)
+
+
+def test_process_file_remove_mode_dry_run(tmp_path: Path) -> None:
+    """Verifies dry-run remove reporting (hits line 117)."""
+    f = tmp_path / "remove_dry.py"
+    f.write_text("# File: test.py\nprint('hi')\n", encoding="utf-8")
+    assert process_file(str(f), fix_mode=False, remove_mode=True)
+
+
+def test_declaration_strategy_multiline_discovery(tmp_path: Path) -> None:
+    """Verifies multiline discovery in DeclarationStrategy (hits lines 166, 174)."""
+    # 1. Multiline XML
+    xml = tmp_path / "multi.xml"
+    xml.write_text("<?xml\nversion='1.0'?>\n<root/>\n", encoding="utf-8")
+    assert process_file(str(xml), fix_mode=True)
+    assert xml.read_text().startswith("<?xml\nversion='1.0'?>\n<!-- File:")
+
+    # 2. Multiline CSS
+    css = tmp_path / "multi.css"
+    css.write_text("@charset\n'UTF-8';\nbody {}\n", encoding="utf-8")
+    assert process_file(str(css), fix_mode=True)
+    assert css.read_text().startswith("@charset\n'UTF-8';\n/* File:")
+
+
+def test_php_strategy_extra_skips(tmp_path: Path) -> None:
+    """Verifies PHP strategy safety skips for XML and one-liners (hits line 204)."""
+    # One-liner PHP should be skipped
+    php = tmp_path / "oneliner.php"
+    php.write_text("<?php echo 'hi'; ?>\n", encoding="utf-8")
+    assert not process_file(str(php), fix_mode=True)
+
+
+def test_process_file_remove_mode_deduplicates(tmp_path: Path) -> None:
+    """Verifies that remove_mode removes ALL headers from a file."""
+    f = tmp_path / "remove_all.py"
+    f.write_text("# File: 1.py\n# File: 2.py\nprint('hi')\n", encoding="utf-8")
+
+    assert process_file(str(f), fix_mode=True, remove_mode=True)
+    assert f.read_text() == "print('hi')\n"
+
+
+def test_process_file_no_fix_dedup_report(tmp_path: Path) -> None:
+    """Verifies that deduplication is reported in check-only mode."""
+    f = tmp_path / "dedup_report.py"
+    f.write_text("# File: 1.py\n# File: 1.py\nprint('hi')\n", encoding="utf-8")
+
+    # Correct header but duplicate
+    assert process_file(str(f), fix_mode=False)
+
+
+def test_process_file_incorrect_and_dedup_report(tmp_path: Path) -> None:
+    """Verifies that incorrect + duplicate is reported in check-only mode."""
+    f = tmp_path / "wrong_dedup.py"
+    f.write_text("# File: wrong.py\n# File: extra.py\nprint('hi')\n", encoding="utf-8")
+
+    assert process_file(str(f), fix_mode=False)
+
+
+def test_strategies_with_headers_discovery(tmp_path: Path) -> None:
+    """Verifies that all strategies can find directives underneath existing headers."""
+    # 1. Dockerfile
+    df = tmp_path / "Dockerfile"
+    df.write_text(
+        "# File: test.dockerfile\n# syntax=docker/dockerfile:1\nFROM alpine\n",
+        encoding="utf-8",
+    )
+    # Should move header after directive
+    assert process_file(str(df), fix_mode=True)
+    assert df.read_text().startswith("# syntax=docker/dockerfile:1\n# File:")
+
+    # 2. Python
+    py = tmp_path / "discovery.py"
+    py.write_text(
+        "# File: old.py\n# -*- coding: utf-8 -*-\nprint('hi')\n", encoding="utf-8"
+    )
+    assert process_file(str(py), fix_mode=True)
+    assert py.read_text().startswith("# -*- coding: utf-8 -*-\n# File:")
+
+    # 3. PHP
+    php = tmp_path / "discovery.php"
+    php.write_text("// File: old.php\n<?php\necho 'hi';\n", encoding="utf-8")
+    assert process_file(str(php), fix_mode=True)
+    assert php.read_text().startswith("<?php\n// File:")
+
+    # 4. Frontmatter
+    md = tmp_path / "discovery.md"
+    md.write_text(
+        "<!-- File: old.md -->\n---\ntitle: test\n---\nbody\n", encoding="utf-8"
+    )
+    assert process_file(str(md), fix_mode=True)
+    assert "---\ntitle: test\n---\n<!-- File:" in md.read_text()
+
+
+def test_python_strategy_cookie_only_with_header(tmp_path: Path) -> None:
+    """Verifies PythonStrategy with header then cookie (no shebang)."""
+    py = tmp_path / "cookie_only.py"
+    py.write_text("# File: old.py\n# -*- coding: utf-8 -*-\n", encoding="utf-8")
+    assert process_file(str(py), fix_mode=True)
+    # Selection logic:
+    # idx=1 (skips header). base_idx=1.
+    # scan for cookie starting at 1. Finds it at 1. returns 2.
+    # core.py removes 0, adds at 2.
+    assert py.read_text().startswith("# -*- coding: utf-8 -*-\n# File:")
+
+
+def test_dockerfile_strategy_no_discovery(tmp_path: Path) -> None:
+    """Verifies DockerfileStrategy when only headers exist (should return 0)."""
+    df = tmp_path / "Dockerfile.no_disc"
+    header = f"# File: {df.as_posix()}\n"
+    df.write_text(f"{header}FROM alpine\n", encoding="utf-8")
+    assert not process_file(str(df), fix_mode=True)
+
+
+def test_strategy_edge_cases(tmp_path: Path) -> None:
+    """Verifies safety skips and edge cases for strategies to reach 100% coverage."""
+    # 1. Shebang empty file
+    empty = tmp_path / "empty.sh"
+    empty.touch()
+    assert process_file(str(empty), fix_mode=True)
+
+    # 2. Dockerfile with Shebang discovered
+    df = tmp_path / "Dockerfile.shebang"
+    df.write_text("#!/bin/sh\nFROM alpine\n", encoding="utf-8")
+    assert process_file(str(df), fix_mode=True)
+    assert df.read_text().startswith("#!/bin/sh\n# File:")
+
+    # 3. Declaration multiline skip (fail to find end)
+    xml = tmp_path / "unsafe.xml"
+    # Create multiple lines so it enters the loop but fails to find '>'
+    xml.write_text("<?xml version='1.0'\nline 2\nline 3\n", encoding="utf-8")
+    assert not process_file(str(xml), fix_mode=True)
+
+    # 4. PHP XML skip (unsafe to insert before XML decl in PHP)
+    php = tmp_path / "unsafe.php"
+    php.write_text("<?xml version='1.0' encoding='UTF-8'?>\n<?php\n", encoding="utf-8")
+    assert not process_file(str(php), fix_mode=True)
+
+    # 5. Frontmatter unclosed skip
+    md = tmp_path / "unsafe.md"
+    md.write_text("---\ntitle: unclosed\nbody\n", encoding="utf-8")
+    assert not process_file(str(md), fix_mode=True)
+
+    # 6. File only headers (DeclarationStrategy)
+    only_h = tmp_path / "only.xml"
+    only_h.write_text("<!-- File: 1.xml -->\n<!-- File: 2.xml -->\n", encoding="utf-8")
+    assert process_file(str(only_h), fix_mode=True)  # Deduplicates to one
+
+    # 7. Unclosed CSS
+    css = tmp_path / "unsafe.css"
+    css.write_text("@charset 'UTF-8'\nbody {}\n", encoding="utf-8")  # No semicolon
+    assert not process_file(str(css), fix_mode=True)

@@ -18,20 +18,26 @@ class ShebangStrategy(HeaderStrategy):
     """
 
     def get_insertion_index(self, lines: list[str]) -> int:
-        """Determines insertion index by skipping a Shebang line.
+        """Determines insertion index skipping any existing headers to find a Shebang.
 
         Args:
             lines: List of lines in the file.
 
         Returns:
-            1 if a Shebang is present on the first line, otherwise 0.
+            The line index after a Shebang if one exists (even if preceded by headers).
+            Returns 0 if no Shebang is found.
         """
         if not lines:
             return 0
 
-        # Skip Shebang if on line 0
-        if lines[0].startswith("#!"):
-            return 1
+        idx = 0
+        while idx < len(lines) and self.is_header_line(lines[idx]):
+            idx += 1
+
+        if idx < len(lines) and lines[idx].startswith("#!"):
+            return idx + 1
+
+        # If no shebang was found underneath headers, the earliest valid spot is 0.
         return 0
 
 
@@ -43,32 +49,43 @@ class DockerfileStrategy(ShebangStrategy):
     """
 
     def get_insertion_index(self, lines: list[str]) -> int:
-        """Determines insertion index skipping parser directives."""
-        # 1. Check for Shebang first (rare but handled by parent)
-        idx = super().get_insertion_index(lines)
+        """Determines insertion index skipping headers, shebangs, and directives."""
+        # 1. Start by finding the end of headers + shebang
+        idx = 0
+        while idx < len(lines) and self.is_header_line(lines[idx]):
+            idx += 1
+
+        if idx < len(lines) and lines[idx].startswith("#!"):
+            idx += 1
 
         # 2. Skip Parser Directives
-        # Directives must be at the top, but can follow a shebang if valid.
+        # Directives must be near the top.
         while idx < len(lines):
             line = lines[idx].strip()
             # Directive format: # directive=value
             if line.startswith("#"):
                 # Normalize content to check for directive keys
-                # Directives are case-insensitive.
-                # Format allows spaces: # syntax = docker/dockerfile:1
                 content = line[1:].strip().lower()
-
-                # Partition at the first '=' to separate key and value
                 key, sep, _ = content.partition("=")
-
                 if sep and key.strip() in ("syntax", "escape", "check"):
                     idx += 1
                     continue
-
-            # If we hit a non-directive line (including other comments or whitespace), we stop.
             break
 
-        return idx
+        # If we skipped anything, that's our base index.
+        # But if we were at the very top (only headers), return 0.
+        # Wait, if we only had headers, idx is now > 0.
+        # If we only had headers, we want to return 0.
+
+        # Check if we actually skipped a directive or shebang
+        discovered_skip = False
+        scan_idx = 0
+        while scan_idx < len(lines) and self.is_header_line(lines[scan_idx]):
+            scan_idx += 1
+        if scan_idx < idx:
+            discovered_skip = True
+
+        return idx if discovered_skip else 0
 
 
 class PythonStrategy(ShebangStrategy):
@@ -80,97 +97,86 @@ class PythonStrategy(ShebangStrategy):
     LOOKAHEAD_LIMIT = 2
 
     def get_insertion_index(self, lines: list[str]) -> int:
-        """Determines insertion index skipping Shebangs and encoding cookies.
+        """Determines insertion index skipping headers, shebangs, and encoding cookies."""
+        # 1. Find end of headers + shebang
+        base_idx = 0
+        while base_idx < len(lines) and self.is_header_line(lines[base_idx]):
+            base_idx += 1
 
-        Args:
-            lines: List of lines in the file.
+        has_shebang = False
+        if base_idx < len(lines) and lines[base_idx].startswith("#!"):
+            base_idx += 1
+            has_shebang = True
 
-        Returns:
-            The line index after any Shebang and/or encoding cookie.
-        """
-        idx = super().get_insertion_index(lines)
-
-        # Check for encoding cookie in lines [idx ... limit]
-        for i in range(idx, min(len(lines), self.LOOKAHEAD_LIMIT)):
+        # 2. Check for encoding cookie in subsequent lines
+        idx = base_idx
+        limit = min(len(lines), idx + self.LOOKAHEAD_LIMIT)
+        has_cookie = False
+        for i in range(idx, limit):
             line = lines[i].strip()
-            # Regex approximation of PEP 263
             if (
                 line.startswith("#")
                 and "coding" in line
                 and ("=" in line or ":" in line)
             ):
-                return i + 1
+                idx = i + 1
+                has_cookie = True
+                break
 
-        return idx
+        return idx if (has_shebang or has_cookie) else 0
 
 
 class DeclarationStrategy(HeaderStrategy):
     """
     Strategy for files requiring Top-of-File Declarations.
     Used for XML, HTML, CSS, Razor, and ASP/JSP.
-
-    Skips:
-    - XML declaration (<?xml ...)
-    - HTML Doctype (<!DOCTYPE ...)
-    - ASP/JSP directives (<%@ ...)
-    - CSS Charset (@charset ...)
-    - Razor Page directives (@page ...)
     """
 
-    # Safety: Limit lookahead to avoid performance issues on massive files
     SEARCH_LIMIT = 20
-    # Safety: CSS charsets must be at the very top (first few lines)
     CSS_SEARCH_LIMIT = 5
 
     def get_insertion_index(self, lines: list[str]) -> int:
-        """Determines insertion index skipping declarations.
-
-        Safety:
-        - If the declaration spans multiple lines, we attempt to find the end.
-        - If we cannot safely find the end, we return -1 (Skip).
-        """
+        """Determines insertion index skipping headers and declarations."""
         if not lines:
             return 0
 
-        first_line = lines[0].strip()
+        idx = 0
+        while idx < len(lines) and self.is_header_line(lines[idx]):
+            idx += 1
+
+        if idx >= len(lines):
+            return 0
+
+        first_line = lines[idx].strip()
         lower_line = first_line.lower()
 
         # Check for specific declaration types
         is_tag_decl = (
-            first_line.startswith("<?xml")  # <?xml ... ?>
-            or lower_line.startswith("<!doctype")  # <!DOCTYPE ... >
-            or first_line.startswith("<%@")  # <%@ ... %>
+            first_line.startswith("<?xml")
+            or lower_line.startswith("<!doctype")
+            or first_line.startswith("<%@")
         )
-
-        is_css_decl = lower_line.startswith("@charset")  # @charset "...";
-        is_razor_decl = lower_line.startswith("@page")  # @page ...
+        is_css_decl = lower_line.startswith("@charset")
+        is_razor_decl = lower_line.startswith("@page")
 
         if is_tag_decl:
-            # Look for closing '>'
-            # Check line 0 first
             if ">" in first_line:
-                return 1
-
-            # Check subsequent lines (up to limit)
-            for i in range(1, min(len(lines), self.SEARCH_LIMIT)):
+                return idx + 1
+            for i in range(idx + 1, min(len(lines), idx + self.SEARCH_LIMIT)):
                 if ">" in lines[i]:
                     return i + 1
-
-            # If not closed within limit, skip file (unsafe/ambiguous)
             return -1
 
         if is_css_decl:
-            # Look for closing ';'
             if ";" in first_line:
-                return 1
-            for i in range(1, min(len(lines), self.CSS_SEARCH_LIMIT)):
+                return idx + 1
+            for i in range(idx + 1, min(len(lines), idx + self.CSS_SEARCH_LIMIT)):
                 if ";" in lines[i]:
                     return i + 1
             return -1
 
         if is_razor_decl:
-            # Razor @page is typically a single line directive ending at newline.
-            return 1
+            return idx + 1
 
         return 0
 
@@ -182,32 +188,22 @@ class PhpStrategy(ShebangStrategy):
     """
 
     def get_insertion_index(self, lines: list[str]) -> int:
-        """Determines insertion index skipping Shebangs and PHP open tags.
+        """Determines insertion index skipping headers, shebangs, and PHP open tags."""
+        # 1. Find end of headers + shebang
+        idx = 0
+        while idx < len(lines) and self.is_header_line(lines[idx]):
+            idx += 1
 
-        Returns:
-            The line index after the PHP open tag, if present.
-            Returns -1 if no PHP tag is found, or if unsafe (XML/One-liners).
-        """
-        idx = super().get_insertion_index(lines)
+        if idx < len(lines) and lines[idx].startswith("#!"):
+            idx += 1
 
         if idx < len(lines):
             line = lines[idx].strip()
-            # Check for PHP opening tag
             if line.startswith("<?"):
-                # Safety: Skip XML declarations to prevent corruption
-                if line.lower().startswith("<?xml"):
+                if line.lower().startswith("<?xml") or "?>" in line:
                     return -1
-
-                # Safety: Skip one-liners where the tag closes on the same line
-                if "?>" in line:
-                    return -1
-
                 return idx + 1
 
-        # If we are here, we didn't find a PHP opening tag (or it's pure HTML).
-        # Inserting a `//` comment in a file that might be pure HTML
-        # (interpreted by PHP engine) results in visible text on the page.
-        # It is safer to SKIP this file.
         return -1
 
 
@@ -218,26 +214,18 @@ class FrontmatterStrategy(HeaderStrategy):
     """
 
     def get_insertion_index(self, lines: list[str]) -> int:
-        """Determines insertion index by skipping YAML Frontmatter.
-
-        Args:
-            lines: List of lines in the file.
-
-        Returns:
-            The line index after the closing '---' of the frontmatter, or 0.
-            Returns -1 if the frontmatter block is unclosed (safety skip).
-        """
+        """Determines insertion index skipping headers and YAML Frontmatter."""
         if not lines:
             return 0
 
-        # Check for frontmatter start
-        if lines[0].strip() == "---":
-            # Find the closing fence
-            for i in range(1, len(lines)):
+        idx = 0
+        while idx < len(lines) and self.is_header_line(lines[idx]):
+            idx += 1
+
+        if idx < len(lines) and lines[idx].strip() == "---":
+            for i in range(idx + 1, len(lines)):
                 if lines[i].strip() == "---":
                     return i + 1
-
-            # Safety: Unclosed frontmatter block. Do not insert header.
             return -1
 
         return 0

@@ -32,6 +32,21 @@ def test_shebang_strategy_skips_shebang() -> None:
     assert strategy.get_insertion_index(lines_plain) == 0
 
 
+def test_shebang_strategy_skips_existing_headers() -> None:
+    """Verifies that ShebangStrategy skips existing headers when finding insertion index.
+
+    This ensures 100% coverage by hitting the header-skipping while loop.
+    """
+    strategy = ShebangStrategy("# File: {}")
+    lines = ["# File: already_there.py\n", "#!/bin/bash\n", "echo 1\n"]
+    # Should skip the header, find the shebang, and return index 2
+    assert strategy.get_insertion_index(lines) == 2
+
+    # Case without shebang: should return 0 (headers are overwritten/deduplicated by core logic)
+    lines_no_shebang = ["# File: already_there.py\n", "print(1)\n"]
+    assert strategy.get_insertion_index(lines_no_shebang) == 0
+
+
 def test_dockerfile_strategy_skips_directives() -> None:
     """Verifies that DockerfileStrategy skips syntax and escape directives."""
     strategy = DockerfileStrategy("# File: {}")

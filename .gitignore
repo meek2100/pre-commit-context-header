@@ -31,3 +31,7 @@ ENV/
 .vscode/
 .idea/
 .DS_Store
+
+# Logs
+*.log
+*.txt
