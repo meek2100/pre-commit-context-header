@@ -96,11 +96,13 @@ def process_file(filepath: str, fix_mode: bool, remove_mode: bool = False) -> bo
     # Calculate preamble range to prevent stripping header-shaped comments inside code body
     preamble_end = len(lines)
     for i, line in enumerate(lines):
+        if i < insert_idx or i == primary_header_idx:
+            continue
+
         stripped = line.strip()
         if not stripped:
             continue
 
-        # 7. Calculate preamble range to prevent stripping header-shaped comments inside code body
         if (
             strategy.is_header_line(line)
             or stripped == "---"
