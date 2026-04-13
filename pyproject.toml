@@ -28,21 +28,21 @@ Changelog = "https://github.com/meek2100/pre-commit-context-header/releases"
 
 [project.optional-dependencies]
 dev = [
-    "pytest==9.0.2",
-    "pytest-cov==7.0.0",
-    "ruff==0.15.5",
+    "pytest==9.0.3",
+    "pytest-cov==7.1.0",
+    "ruff==0.15.10",
     "pre-commit==4.5.1",
-    "mypy==1.19.1",
+    "mypy==1.20.1",
     "pyright>=1.1.408",
-    "types-setuptools>=80.9.0",
-    "types-PyYAML>=6.0.12",
+    "types-setuptools>=82.0.0.20260408",
+    "types-PyYAML>=6.0.12.20260408",
 ]
 
 [project.scripts]
 context-headers = "context_headers.cli:main"
 
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=82.0.1"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-data]
