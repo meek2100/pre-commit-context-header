@@ -1,7 +1,7 @@
 # File: pyproject.toml
 [project]
 name = "pre-commit-context-header"
-version = "0.1.1"
+dynamic = ["version"]
 description = "A universal pre-commit utility that enforces file path headers to ensure AI coding agents and LLMs always maintain context."
 authors = [{ name = "meek2100", email = "meek2100@users.noreply.github.com" }]
 requires-python = ">=3.10"
@@ -47,6 +47,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-data]
 context_headers = ["py.typed"]
+
+[tool.setuptools.dynamic]
+version = { attr = "context_headers.__version__" }
 
 [tool.mypy]
 strict = true
