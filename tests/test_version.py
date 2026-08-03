@@ -31,13 +31,17 @@ def test_pyproject_does_not_duplicate_the_version() -> None:
     __version__ said 0.1.0, and the release shipped with two different answers.
     """
     content = PYPROJECT.read_text(encoding="utf-8")
-    assert 'dynamic = ["version"]' in content, "pyproject must declare a dynamic version"
+
+    assert 'dynamic = ["version"]' in content, (
+        "pyproject must declare a dynamic version"
+    )
+
     assert 'attr = "context_headers.__version__"' in content, (
         "pyproject must resolve the version from context_headers.__version__"
     )
     literal = re.search(r"^\s*version\s*=\s*[\"']", content, re.MULTILINE)
     assert literal is None, (
-        "pyproject.toml contains a literal `version = \"...\"`. It will drift from "
+        'pyproject.toml contains a literal `version = "..."`. It will drift from '
         "__version__. Remove it and let [tool.setuptools.dynamic] resolve it."
     )
 
@@ -45,7 +49,7 @@ def test_pyproject_does_not_duplicate_the_version() -> None:
 def test_built_metadata_matches_source() -> None:
     """When installed, the built distribution's version must equal __version__.
 
-    This is what actually proves the dynamic wiring worked — the config test
+    This is what actually proves the dynamic wiring worked - the config test
     above only proves it is declared.
     """
     from importlib.metadata import PackageNotFoundError, version
