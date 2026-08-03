@@ -91,4 +91,4 @@ hooks:
 - **Line Endings**: The tool uses Python's universal newline mode and may normalize line endings to the system default of the machine running the hook.
 - **Safety**: Files larger than 1MB are automatically skipped to prevent performance issues.
 - **Safety**: Standard lockfiles (e.g., `package-lock.json`, `Cargo.lock`, `go.sum`) are automatically skipped internally to prevent corruption.
-- **Ambiguity**: `.m` files are assumed to be Objective-C (using `//` comments). MATLAB/Octave users should exclude `.m` files in their pre-commit config to avoid syntax errors.
+- **Ambiguity**: `.m` files are assumed to be Objective-C (using `//` comments). MATLAB/Octave users should exclude `.m` files in their pre-commit config to avoid syntax errors..
