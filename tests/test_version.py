@@ -31,9 +31,11 @@ def test_pyproject_does_not_duplicate_the_version() -> None:
     __version__ said 0.1.0, and the release shipped with two different answers.
     """
     content = PYPROJECT.read_text(encoding="utf-8")
+
     assert 'dynamic = ["version"]' in content, (
         "pyproject must declare a dynamic version"
     )
+
     assert 'attr = "context_headers.__version__"' in content, (
         "pyproject must resolve the version from context_headers.__version__"
     )
