@@ -7,10 +7,11 @@ strategy selection, and content modification.
 """
 
 from __future__ import annotations
+
 import sys
 from pathlib import Path
 
-from .config import MAX_FILE_SIZE_BYTES, ALWAYS_SKIP_FILENAMES
+from .config import ALWAYS_SKIP_FILENAMES, MAX_FILE_SIZE_BYTES
 from .languages.factory import get_strategy_for_file
 
 __all__ = ["process_file"]
@@ -78,8 +79,7 @@ def process_file(filepath: str, fix_mode: bool, remove_mode: bool = False) -> bo
     if lines and not lines[-1].endswith("\n"):
         lines[-1] += "\n"
 
-    if insert_idx > len(lines):
-        insert_idx = len(lines)
+    insert_idx = min(insert_idx, len(lines))
 
     # 6. Primary Header Selection & Deduplication
     primary_header_idx = -1

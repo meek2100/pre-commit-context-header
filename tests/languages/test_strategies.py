@@ -7,14 +7,15 @@ file types, respecting shebangs, directives, and frontmatter.
 """
 
 from pathlib import Path
+
 from context_headers.languages.factory import get_strategy_for_file
 from context_headers.languages.strategies import (
-    ShebangStrategy,
-    PythonStrategy,
     DeclarationStrategy,
-    PhpStrategy,
-    FrontmatterStrategy,
     DockerfileStrategy,
+    FrontmatterStrategy,
+    PhpStrategy,
+    PythonStrategy,
+    ShebangStrategy,
 )
 
 
@@ -199,12 +200,7 @@ def test_frontmatter_strategy_skips_block() -> None:
     lines_none = ["<h1>Hi</h1>\n"]
     assert strategy.get_insertion_index(lines_none) == 0
 
-    # Case 3: Unclosed (safety check, returns 0) - This behavior is now UPDATED to return -1 (Skip)
-    # The previous test_frontmatter_strategy_skips_block tested a scenario where it returned 0,
-    # but based on the fix, it should now return -1.
-    # However, to preserve the integrity of the original test suite structure,
-    # I will move the "Unclosed" case to the explicit test below and keep this focused on valid blocks.
-    pass
+    # Note: Unclosed frontmatter is tested in test_frontmatter_strategy_unclosed below.
 
 
 def test_frontmatter_strategy_unclosed() -> None:

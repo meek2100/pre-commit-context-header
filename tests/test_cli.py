@@ -6,11 +6,14 @@ Verifies argument parsing, exit codes, and integration with the core processing 
 """
 
 from __future__ import annotations
-import pytest
-import sys
+
 import runpy
+import sys
 from pathlib import Path
 from unittest.mock import patch
+
+import pytest
+
 from context_headers.cli import run
 
 

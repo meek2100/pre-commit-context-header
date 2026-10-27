@@ -6,11 +6,13 @@ Verifies file reading/writing, strategy application, idempotency,
 and safety mechanisms like size limits and binary file skipping.
 """
 
-import pytest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
-from context_headers.core import process_file
+from unittest.mock import MagicMock, patch
+
+import pytest
+
 from context_headers.config import MAX_FILE_SIZE_BYTES
+from context_headers.core import process_file
 
 
 def test_process_file_adds_header(tmp_path: Path) -> None:

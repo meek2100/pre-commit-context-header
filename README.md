@@ -14,22 +14,22 @@ While file headers are not required by compilers, they provide critical context 
 
 Add this to your `.pre-commit-config.yaml` in any project:
 
-```yaml
+~~~yaml
 repos:
   - repo: https://github.com/meek2100/pre-commit-context-header
-    rev: v0.1.0 # Use the latest tag
+    rev: v0.1.1 # Use the latest tag
     hooks:
       - id: context-headers
         args: [--fix] # Optional: Remove this line if you only want to check, not auto-fix
-```
+~~~
 
 ### CLI Options
 
-You can also run the tool manually (after `pip install pre-commit-context-header`):
+You can also run the tool manually (e.g., via `uvx pre-commit-context-header` or after `uv tool install pre-commit-context-header` / `pip install pre-commit-context-header`):
 
 - **`--fix`**: Automatically adds or updates missing headers.
 - **`--remove`**: **Removes** context headers from all targeted files. Useful if you decide to uninstall the tool or need to "reset" files.
-- _Example:_ `context-headers --remove src/**/*.py`
+- _Example:_ `uvx pre-commit-context-header --remove src/**/*.py`
 
 ## Supported File Types
 
@@ -78,12 +78,12 @@ The tool supports context headers for **200+ file extensions**.
 
 To exclude specific files (like minified assets, migrations, or generated documentation) from having headers added, use the `exclude` regex in your `.pre-commit-config.yaml`:
 
-```yaml
+~~~yaml
 hooks:
   - id: context-headers
     args: [--fix]
     exclude: ^(docs/|migrations/|.*\.min\.js)
-```
+~~~
 
 ### Notes
 

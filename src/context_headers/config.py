@@ -9,13 +9,13 @@ supported extensions, skipped files, and their specific comment styles.
 from __future__ import annotations
 
 __all__ = [
-    "MAX_FILE_SIZE_BYTES",
     "ALWAYS_SKIP_FILENAMES",
     "COMMENT_STYLES",
-    "PYTHON_EXTS",
-    "PHP_EXTS",
-    "FRONTMATTER_EXTS",
     "DECLARATION_EXTS",
+    "FRONTMATTER_EXTS",
+    "MAX_FILE_SIZE_BYTES",
+    "PHP_EXTS",
+    "PYTHON_EXTS",
 ]
 
 # Safety: Do not process files larger than this (1MB) to prevent hangs.

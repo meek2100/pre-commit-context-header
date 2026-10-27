@@ -41,6 +41,6 @@ This directory contains the central logic for the pre-commit hook. AI agents mus
 
 EVERY source file in this project MUST have a valid context header.
 
-```python
+~~~python
 # File: path/to/file.py
-```
+~~~

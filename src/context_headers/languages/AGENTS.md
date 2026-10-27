@@ -40,6 +40,6 @@ This directory implements the **Strategy Pattern** for language-specific header 
 
 EVERY source file in this project MUST have a valid context header.
 
-```python
+~~~python
 # File: path/to/file.py
-```
+~~~

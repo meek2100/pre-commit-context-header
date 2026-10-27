@@ -7,7 +7,9 @@ Python configuration (Single Source of Truth enforcement).
 """
 
 from __future__ import annotations
+
 from pathlib import Path
+
 from context_headers.config import ALWAYS_SKIP_FILENAMES
 
 

@@ -7,17 +7,19 @@ file extensions and naming conventions (e.g., Dockerfiles, Dotfiles).
 """
 
 from __future__ import annotations
+
 from pathlib import Path
+
 from context_headers.config import COMMENT_STYLES
 from context_headers.languages.base import HeaderStrategy
 from context_headers.languages.factory import get_strategy_for_file
 from context_headers.languages.strategies import (
-    PythonStrategy,
     DeclarationStrategy,
-    ShebangStrategy,
-    PhpStrategy,
-    FrontmatterStrategy,
     DockerfileStrategy,
+    FrontmatterStrategy,
+    PhpStrategy,
+    PythonStrategy,
+    ShebangStrategy,
 )
 
 

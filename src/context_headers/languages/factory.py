@@ -6,23 +6,24 @@ Maps file extensions and names to specific HeaderStrategy implementations.
 """
 
 from __future__ import annotations
+
 from pathlib import Path
 
 from ..config import (
     COMMENT_STYLES,
-    PYTHON_EXTS,
-    PHP_EXTS,
-    FRONTMATTER_EXTS,
     DECLARATION_EXTS,
+    FRONTMATTER_EXTS,
+    PHP_EXTS,
+    PYTHON_EXTS,
 )
 from .base import HeaderStrategy
 from .strategies import (
+    DeclarationStrategy,
+    DockerfileStrategy,
+    FrontmatterStrategy,
+    PhpStrategy,
     PythonStrategy,
     ShebangStrategy,
-    DeclarationStrategy,
-    PhpStrategy,
-    FrontmatterStrategy,
-    DockerfileStrategy,
 )
 
 

@@ -14,11 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.14"
-          cache: "pip"
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.14
 
       - name: Cache pre-commit
         uses: actions/cache@v4
@@ -30,8 +32,8 @@ jobs:
         # We skip 'no-commit-to-branch' in CI because we are often ALREADY on 'main'
         # during the 'push' event, which would cause a false positive failure.
         run: |
-          pip install .[dev]
-          SKIP=no-commit-to-branch pre-commit run --all-files --show-diff-on-failure
+          uv sync --locked
+          SKIP=no-commit-to-branch uv run pre-commit run --all-files --show-diff-on-failure
 
   test:
     name: Test Python ${{ matrix.python-version }}
@@ -46,19 +48,14 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+      - name: Install uv and Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install .[dev]
+          enable-cache: true
 
       - name: Run Tests
-        run: pytest --junitxml=test-results-${{ matrix.python-version }}.xml
+        run: uv run pytest --junitxml=test-results-${{ matrix.python-version }}.xml
 
       - name: Upload Test Results
         if: always()

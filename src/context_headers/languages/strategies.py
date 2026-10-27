@@ -7,6 +7,7 @@ XML declarations, Frontmatter, etc.
 """
 
 from __future__ import annotations
+
 from .base import HeaderStrategy
 
 
@@ -151,10 +152,8 @@ class DeclarationStrategy(HeaderStrategy):
         lower_line = first_line.lower()
 
         # Check for specific declaration types
-        is_tag_decl = (
-            first_line.startswith("<?xml")
-            or lower_line.startswith("<!doctype")
-            or first_line.startswith("<%@")
+        is_tag_decl = first_line.startswith(("<?xml", "<%@")) or lower_line.startswith(
+            "<!doctype"
         )
         is_css_decl = lower_line.startswith("@charset")
         is_razor_decl = lower_line.startswith("@page")

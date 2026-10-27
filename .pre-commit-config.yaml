@@ -22,7 +22,7 @@ repos:
   # 2. Project Specific Fixers (Fast)
   # Apply headers now that the file is clean.
   - repo: https://github.com/meek2100/pre-commit-context-header
-    rev: v0.1.0
+    rev: v0.1.1
     hooks:
       - id: context-headers
         args: [--fix]
@@ -30,7 +30,7 @@ repos:
   # 3. Linting & Formatting (Fast)
   # Ruff cleans up code style and catches syntax errors immediately.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.10
+    rev: v0.16.4
     hooks:
       - id: ruff-check
         args: ["--fix"]
@@ -45,7 +45,6 @@ repos:
         args: ["--no-incremental"]
         additional_dependencies:
           - pytest
-          - click
           - pyyaml
           - types-PyYAML
 
@@ -56,6 +55,5 @@ repos:
         # Mirroring dependencies to ensure Pyright can resolve imports
         additional_dependencies:
           - pytest
-          - click
           - pyyaml
           - types-PyYAML

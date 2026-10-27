@@ -6,12 +6,13 @@ Handles argument parsing and orchestrates file processing.
 """
 
 from __future__ import annotations
+
 import argparse
 import sys
 
 from .core import process_file
 
-__all__ = ["run", "main"]
+__all__ = ["main", "run"]
 
 
 def run(argv: list[str] | None = None) -> int:
