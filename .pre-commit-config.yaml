@@ -30,7 +30,7 @@ repos:
   # 3. Linting & Formatting (Fast)
   # Ruff cleans up code style and catches syntax errors immediately.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.4
+    rev: v0.17.3
     hooks:
       - id: ruff-check
         args: ["--fix"]
@@ -39,7 +39,7 @@ repos:
   # 4. Type Checking (Slowest)
   # Run these last. If the code is broken or malformed, the previous steps will catch it first.
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.19.1"
+    rev: "v2.4.0"
     hooks:
       - id: mypy
         args: ["--no-incremental"]
@@ -49,7 +49,7 @@ repos:
           - types-PyYAML
 
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.408
+    rev: v1.1.414
     hooks:
       - id: pyright
         # Mirroring dependencies to ensure Pyright can resolve imports

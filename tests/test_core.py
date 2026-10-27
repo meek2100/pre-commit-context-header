@@ -472,3 +472,19 @@ def test_strategy_edge_cases(tmp_path: Path) -> None:
     css = tmp_path / "unsafe.css"
     css.write_text("@charset 'UTF-8'\nbody {}\n", encoding="utf-8")  # No semicolon
     assert not process_file(str(css), fix_mode=True)
+
+
+def test_process_file_declaration_deduplication(tmp_path: Path) -> None:
+    """Verifies that redundant headers are deduplicated in declaration files like XML."""
+    xml = tmp_path / "dedup.xml"
+    correct_header = f"<!-- File: {xml.as_posix()} -->\n"
+    content = (
+        '<?xml version="1.0"?>\n'
+        f"{correct_header}"
+        "<!-- File: duplicate.xml -->\n"
+        "<root/>\n"
+    )
+    xml.write_text(content, encoding="utf-8")
+    assert process_file(str(xml), fix_mode=True)
+    assert xml.read_text().count("<!-- File:") == 1
+    assert xml.read_text().startswith(f'<?xml version="1.0"?>\n{correct_header}')
