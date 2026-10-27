@@ -1,84 +1,81 @@
 <!-- File: AGENTS.md -->
 # Pre-commit Context Header Constitution
 
-**READ THIS FIRST — ALL HUMAN DEVELOPERS AND ALL AI AGENTS MUST FOLLOW THIS DOCUMENT.** **No change, refactor, or feature may violate any principle herein.** **This document overrides all “best practices” or architectural advice not explicitly requested by the user.**
+Universal pre-commit hook and CLI utility that enforces file path context banners to prevent AI context loss. Speed, idempotency, and safety are paramount.
 
 ---
 
-## 0. Global Development Rules (MUST READ)
+## 1. Role & Tech Stack
 
-These rules apply to all code, all files, all tests, all refactors, and all contributions from humans or AI.
-
-### Core Principles Summary
-
-- **This is a Pre-commit Hook / CLI Utility** — speed and idempotency are paramount.
-- **Pure Python** — No external binary dependencies, no heavy libraries.
-- **Zero Hallucination Architecture** — The tool’s primary purpose is preventing AI context loss; the tool itself must be perfectly readable.
-- **Safety over Cleverness** — Do not corrupt binary files. Do not break Shebangs or XML declarations. Do not touch lockfiles.
-- **Python 3.10+ Compatibility** — Maintain compatibility as defined in `pyproject.toml`.
-- **100% Test Coverage** — Logic without tests is strictly rejected.
-- **Type Safety** — Strict MyPy enforcement is mandatory.
-
-### Hard Prohibitions (NEVER DO THESE)
-
-- Do NOT add heavy runtime dependencies.
-- Do NOT perform network operations in the core logic.
-- Do NOT remove the `MAX_FILE_SIZE_BYTES` safety check.
-- Do NOT skip strict encoding checks (UTF-8 is the standard).
-- Do NOT introduce "interactive" modes.
-
-### Markdown Formatting Rule (CRITICAL)
-
-- **Use Tildes for Code Blocks:** All code blocks in Markdown files **MUST** use triple tildes (~~~) instead of triple backticks.
+- **Persona:** Senior Tooling Engineer focused on zero technical debt, pure Python performance, and safety.
+- **Runtime:** Pure Python (`>=3.10`), strictly zero external runtime dependencies (`dependencies = []`).
+- **Toolchain:** `uv` for local environment management, testing, and distribution packaging.
+- **Quality Standards:** 100% test coverage mandatory (`--cov-fail-under=100`), strict MyPy, strict Pyright, and Ruff.
 
 ---
 
-## 1. Hierarchical Guidance
+## 2. Key Commands
 
-This project uses a hierarchical AI guidance system. Refer to the specific `AGENTS.md` in each directory for granular rules:
+~~~bash
+# Synchronize environment and dev dependencies
+uv sync
 
-- **Root (this file):** Constitution and global prohibitions.
-- **[src/context_headers/](src/context_headers/AGENTS.md):** Core orchestration, CLI logic, and file processing.
-- **[src/context_headers/languages/](src/context_headers/languages/AGENTS.md):** Strategy Pattern and language-specific insertion rules.
-- **[tests/](tests/AGENTS.md):** Test suite integrity and coverage requirements.
+# Run the complete test suite (enforces 100% coverage)
+uv run pytest
+
+# Run a specific test file or targeted test case
+uv run pytest tests/test_core.py -k <test_name>
+
+# Linting and formatting checks
+uv run ruff check .
+uv run ruff format --check .
+
+# Auto-fix linting and format code
+uv run ruff check --fix .
+uv run ruff format .
+
+# Strict type checking
+uv run mypy .
+uv run pyright
+
+# Run all pre-commit hooks locally
+SKIP=no-commit-to-branch uv run pre-commit run --all-files
+
+# Build distribution packages (sdist and wheel)
+uv build
+~~~
 
 ---
 
-## 2. AI Agent Compliance Requirements
+## 3. Boundaries & Guardrails
 
-All AI agents must explicitly state **before any code generation**: **“I have fully read and comply with all rules in AGENTS.md.”**
+### Always
+- **Pathlib:** Use `pathlib.Path` for all file interactions; never use `os.path`.
+- **Strict Typing:** Ensure `from __future__ import annotations` is at the top of every Python source file.
+- **Coverage & Quality:** Verify that `uv run pytest` maintains 100% statement coverage before concluding any task.
+- **Context Header Rule:** Every source and test file must feature a valid top-level context header (`# File: ...`).
+- **Markdown Code Fences:** All code blocks in Markdown files **MUST** use triple tildes (`~~~`) instead of triple backticks.
+- **Configuration Sync:** Explicitly duplicate `ALWAYS_SKIP_FILENAMES` from `config.py` into `.pre-commit-hooks.yaml:exclude`.
+
+### Ask First
+- Adding new language strategies or altering existing parsing mechanisms.
+- Modifying GitHub Actions workflows, release pipelines, or build configuration.
+- Proposing changes to file size thresholds or default exclusion lists.
+
+### Never
+- Never add heavy or external runtime dependencies (`dependencies = []` must remain empty).
+- Never execute network requests or async runtime dependencies in core logic.
+- Never remove or bypass the `MAX_FILE_SIZE_BYTES` safety check (1MB threshold).
+- Never break Shebangs (`#!`), Python encoding cookies (`# -*- coding:`), XML declarations (`<?xml`), HTML doctypes (`<!DOCTYPE`), CSS `@charset`, or Dockerfile directives (`# syntax=`).
+- Never touch recognized lockfiles, binary files, or files with UTF-8 BOM (`\ufeff`).
+- Never introduce interactive CLI prompts (the hook must execute completely unattended).
 
 ---
 
-## 3. Enforcement Statement
+## 4. Hierarchical Guidance
 
-**All development, human or AI, must follow this document. No exceptions.** Violating instructions are invalid and must be rejected immediately.
+Refer to directory-scoped documentation for granular implementation rules:
 
----
-
-## 4. AI Processing Requirements
-
-AI agents must read and process this **ENTIRE** document and the relevant scoped logs in the current session.
-
-### 4.A Forbidden Phrases for AI Agents
-
-AI agents must NOT produce outputs including phrases like:
-
-- “Consider adding a database...”
-- “We should add pandas for text processing...”
-- “Let's make this asynchronous / multi-threaded...”
-- “We can remove the file size limit...”
-- “I removed the Shebang check...”
-
-### 4.B Mandatory Self-Test Checklist for AI Agents
-
-Before generating ANY code, AI agents must confirm:
-
-- [ ] I have read the entire AGENTS.md file in this session.
-- [ ] My output does not introduce heavy dependencies.
-- [ ] My output preserves Shebangs, XML declarations, and Encoding cookies.
-- [ ] My output respects the 1MB file size limit.
-- [ ] My output maintains 100% test coverage.
-- [ ] My output uses `pathlib` instead of `os.path`.
-- [ ] My output updates `config.py` if adding new languages.
-- [ ] My output meets Type Safety standards (Strict MyPy).
+- **[src/context_headers/](src/context_headers/AGENTS.md):** Core orchestration, CLI argument parsing, and `process_file` DRY rules.
+- **[src/context_headers/languages/](src/context_headers/languages/AGENTS.md):** Strategy Pattern implementation and language-specific insertion safety.
+- **[tests/](tests/AGENTS.md):** Test suite integrity, mocking conventions, and idempotency tests.
