@@ -30,7 +30,7 @@ Changelog = "https://github.com/meek2100/pre-commit-context-header/releases"
 dev = [
     "pytest==9.2.0",
     "pytest-cov==7.1.0",
-    "ruff==0.17.3",
+    "ruff==0.17.4",
     "pre-commit>=4.6.2",
     "mypy==2.4.1",
     "pyright>=1.1.414",
@@ -42,7 +42,7 @@ dev = [
 dev = [
     "pytest==9.2.0",
     "pytest-cov==7.1.0",
-    "ruff==0.17.3",
+    "ruff==0.17.4",
     "pre-commit>=4.6.2",
     "mypy==2.4.1",
     "pyright>=1.1.414",
